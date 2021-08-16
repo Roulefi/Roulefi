@@ -1,0 +1,1055 @@
+<template>
+  <div class="index" @click="clear_button()"> 
+    <div class="header">
+      <div class="logo">
+      </div>
+      <div class="login">
+        <button @click="sign_out()" v-if="login">SIGNOUT</button>
+        <button @click="sign_in()" v-if="!login">SIGNIN</button>
+      </div>
+    </div>
+    <div class="index-wrapper">
+      <div class="line">
+        <div class="left">
+          <div class="wheel">
+            <div class="place-bet">
+              <svg viewBox="0 0 380 380"  class="spin-ani">
+                <g>
+                  <circle stroke-width="10" stroke="black" stroke-opacity="0.2" fill="transparent" cx="190" cy="190" r="182">
+                  </circle>
+                  <circle stroke="#ec0230" fill="transparent" stroke-width="68" cx="190" cy="190" r="146">
+                  </circle>
+                <g>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#3ab64b"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(19.5,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(38.9,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(58.4,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(77.8,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(97.3,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(116.8,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(136.2,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(155.7,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(175.1,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(194.6,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(214.1,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(233.5,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(253.0,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(272.4,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(291.9,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(311.4,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(330.8,190,190)"></polygon>
+                <polygon points="173.8,10 206.2,10 200.8,79 179.2,79" fill="#2b2627" transform="rotate(350.3,190,190)"></polygon>
+                </g>
+                <g>
+                  <text x="190" y="32" transform="rotate(0.0,190,190)">0</text>
+                  <text x="190" y="32" transform="rotate(9.7,190,190)">32</text>
+                  <text x="190" y="32" transform="rotate(19.5,190,190)">15</text>
+                  <text x="190" y="32" transform="rotate(29.2,190,190)">19</text>
+                  <text x="190" y="32" transform="rotate(38.9,190,190)">4</text>
+                  <text x="190" y="32" transform="rotate(48.7,190,190)">21</text>
+                  <text x="190" y="32" transform="rotate(58.4,190,190)">2</text>
+                  <text x="190" y="32" transform="rotate(68.1,190,190)">25</text>
+                  <text x="190" y="32" transform="rotate(77.8,190,190)">17</text>
+                  <text x="190" y="32" transform="rotate(87.6,190,190)">34</text>
+                  <text x="190" y="32" transform="rotate(97.3,190,190)">6</text>
+                  <text x="190" y="32" transform="rotate(107.0,190,190)">27</text>
+                  <text x="190" y="32" transform="rotate(116.8,190,190)">13</text>
+                  <text x="190" y="32" transform="rotate(126.5,190,190)">36</text>
+                  <text x="190" y="32" transform="rotate(136.2,190,190)">11</text>
+                  <text x="190" y="32" transform="rotate(146.0,190,190)">30</text>
+                  <text x="190" y="32" transform="rotate(155.7,190,190)">8</text>
+                  <text x="190" y="32" transform="rotate(165.4,190,190)">23</text>
+                  <text x="190" y="32" transform="rotate(175.1,190,190)">10</text>
+                  <text x="190" y="32" transform="rotate(184.9,190,190)">5</text>
+                  <text x="190" y="32" transform="rotate(194.6,190,190)">24</text>
+                  <text x="190" y="32" transform="rotate(204.3,190,190)">16</text>
+                  <text x="190" y="32" transform="rotate(214.1,190,190)">33</text>
+                  <text x="190" y="32" transform="rotate(223.8,190,190)">1</text>
+                  <text x="190" y="32" transform="rotate(233.5,190,190)">20</text>
+                  <text x="190" y="32" transform="rotate(243.3,190,190)">14</text>
+                  <text x="190" y="32" transform="rotate(253.0,190,190)">31</text>
+                  <text x="190" y="32" transform="rotate(262.7,190,190)">9</text>
+                  <text x="190" y="32" transform="rotate(272.4,190,190)">22</text>
+                  <text x="190" y="32" transform="rotate(282.2,190,190)">18</text>
+                  <text x="190" y="32" transform="rotate(291.9,190,190)">29</text>
+                  <text x="190" y="32" transform="rotate(301.6,190,190)">7</text>
+                  <text x="190" y="32" transform="rotate(311.4,190,190)">28</text>
+                  <text x="190" y="32" transform="rotate(321.1,190,190)">12</text>
+                  <text x="190" y="32" transform="rotate(330.8,190,190)">35</text>
+                  <text x="190" y="32" transform="rotate(340.6,190,190)">3</text>
+                  <text x="190" y="32" transform="rotate(350.3,190,190)">26</text>
+                </g>
+                <circle stroke-width="25" stroke="black" stroke-opacity="0.2" fill="transparent" cx="190" cy="190" r="116"></circle></g>
+                <g id="ball" class="ball" style="transform: rotate(0deg); transform-origin: 190px 190px; transitionDuration: 5s">
+                  <g transform="translate(178,48)">
+                    <circle opacity=".4" fill="#231F20" cx="13" cy="15" r="13.5"></circle>
+                    <circle fill="#FFF" cx="13" cy="13" r="12.5"></circle>
+                    <path fill="#D1D3D4" d="M20.867 5.825c4.151 4.153 4.153 10.889.002 15.045-4.151 4.155-10.887 4.156-15.039.004-4.153-4.154 3.368-3.368 7.517-7.525 4.152-4.156 3.367-11.678 7.52-7.524z"></path><path fill="#FFF" d="M23.5 15.5a2 2 0 11-4 0 2 2 0 014 0zm-11.5 3a1.5 1.5 0 11-2.999.001A1.5 1.5 0 0112 18.5z"></path><circle fill="#FFF" cx="18.5" cy="8.5" r="1"></circle>
+                  </g>
+                </g>
+              </svg>
+            </div>
+            <div class="wheel-base">
+              <svg viewBox="0 0 380 380"><circle class="text" cx="190" cy="190" r="52" stroke-width="0" fill="rgba(0,0,0,0.2)"></circle><text text-anchor="middle" width="380" x="190" y="187" font-size="18" stroke-width="0">PLACE</text><text text-anchor="middle" width="380" x="190" y="207" font-size="18" stroke-width="0">BET</text></svg>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="board">
+            <div class="board-wrap">
+              <div class="board">
+                <div id="n0" style="grid-area: n0 / n0 / n0 / n0;"><span>0</span></div>
+                <div id="n1" class="red" style="grid-area: n1 / n1 / n1 / n1;"><span>1</span></div>
+                <div id="n2" class="black" style="grid-area: n2 / n2 / n2 / n2;"><span>2</span></div>
+                <div id="n3" class="red" style="grid-area: n3 / n3 / n3 / n3;"><span>3</span></div>
+                <div id="n4" class="black" style="grid-area: n4 / n4 / n4 / n4;"><span>4</span></div>
+                <div id="n5" class="red" style="grid-area: n5 / n5 / n5 / n5;"><span>5</span></div>
+                <div id="n6" class="black" style="grid-area: n6 / n6 / n6 / n6;"><span>6</span></div>
+                <div id="n7" class="red" style="grid-area: n7 / n7 / n7 / n7;"><span>7</span></div>
+                <div id="n8" class="black" style="grid-area: n8 / n8 / n8 / n8;"><span>8</span></div>
+                <div id="n9" class="red" style="grid-area: n9 / n9 / n9 / n9;"><span>9</span></div>
+                <div id="n10" class="black" style="grid-area: n10 / n10 / n10 / n10;"><span>10</span></div>
+                <div id="n11" class="black" style="grid-area: n11 / n11 / n11 / n11;"><span>11</span></div>
+                <div id="n12" class="red" style="grid-area: n12 / n12 / n12 / n12;"><span>12</span></div>
+                <div id="n13" class="black" style="grid-area: n13 / n13 / n13 / n13;"><span>13</span></div>
+                <div id="n14" class="red" style="grid-area: n14 / n14 / n14 / n14;"><span>14</span></div>
+                <div id="n15" class="black" style="grid-area: n15 / n15 / n15 / n15;"><span>15</span></div>
+                <div id="n16" class="red" style="grid-area: n16 / n16 / n16 / n16;"><span>16</span></div>
+                <div id="n17" class="black" style="grid-area: n17 / n17 / n17 / n17;"><span>17</span></div>
+                <div id="n18" class="red" style="grid-area: n18 / n18 / n18 / n18;"><span>18</span></div>
+                <div id="n19" class="red" style="grid-area: n19 / n19 / n19 / n19;"><span>19</span></div>
+                <div id="n20" class="black" style="grid-area: n20 / n20 / n20 / n20;"><span>20</span></div>
+                <div id="n21" class="red" style="grid-area: n21 / n21 / n21 / n21;"><span>21</span></div>
+                <div id="n22" class="black" style="grid-area: n22 / n22 / n22 / n22;"><span>22</span></div>
+                <div id="n23" class="red" style="grid-area: n23 / n23 / n23 / n23;"><span>23</span></div>
+                <div id="n24" class="black" style="grid-area: n24 / n24 / n24 / n24;"><span>24</span></div>
+                <div id="n25" class="red" style="grid-area: n25 / n25 / n25 / n25;"><span>25</span></div>
+                <div id="n26" class="black" style="grid-area: n26 / n26 / n26 / n26;"><span>26</span></div>
+                <div id="n27" class="red" style="grid-area: n27 / n27 / n27 / n27;"><span>27</span></div>
+                <div id="n28" class="black" style="grid-area: n28 / n28 / n28 / n28;"><span>28</span></div>
+                <div id="n29" class="black" style="grid-area: n29 / n29 / n29 / n29;"><span>29</span></div>
+                <div id="n30" class="red" style="grid-area: n30 / n30 / n30 / n30;"><span>30</span></div>
+                <div id="n31" class="black" style="grid-area: n31 / n31 / n31 / n31;"><span>31</span></div>
+                <div id="n32" class="red" style="grid-area: n32 / n32 / n32 / n32;"><span>32</span></div>
+                <div id="n33" class="black" style="grid-area: n33 / n33 / n33 / n33;"><span>33</span></div>
+                <div id="n34" class="red" style="grid-area: n34 / n34 / n34 / n34;"><span>34</span></div>
+                <div id="n35" class="black" style="grid-area: n35 / n35 / n35 / n35;"><span>35</span></div>
+                <div id="n36" class="red" style="grid-area: n36 / n36 / n36 / n36;"><span>36</span></div>
+                <div id="x1" style="grid-area: x1 / x1 / x1 / x1;"><span>2:1</span></div>
+                <div id="x2" style="grid-area: x2 / x2 / x2 / x2;"><span>2:1</span></div>
+                <div id="x3" style="grid-area: x3 / x3 / x3 / x3;"><span>2:1</span></div>
+                <div id="z1" style="grid-area: z1 / z1 / z1 / z1;"><span>1ST 12</span></div>
+                <div id="z2" style="grid-area: z2 / z2 / z2 / z2;"><span>2ND 12</span></div>
+                <div id="z3" style="grid-area: z3 / z3 / z3 / z3;"><span>3RD 12</span></div>
+                <div id="s" style="grid-area: s / s / s / s;"><span>1-18</span></div>
+                <div id="e" style="grid-area: e / e / e / e;"><span>even</span></div>
+                <div id="o" style="grid-area: o / o / o / o;"><span>odd</span></div>
+                <div id="g" style="grid-area: g / g / g / g;"><span>19-36</span></div>
+                <div id="r" style="grid-area: r / r / r / r;">
+                  <svg viewBox="0 0 100 50"><polygon points="50,0 100,25 50,50 0,25"></polygon></svg>
+                </div>
+                <div id="b" style="grid-area: b / b / b / b;">
+                  <svg viewBox="0 0 100 50"><polygon points="50,0 100,25 50,50 0,25"></polygon></svg>
+              </div>
+              </div>
+              <div class="streets"><div id="st0" style="grid-area: st0 / st0 / st0 / st0;"></div>
+                <div id="st1" style="grid-area: st1 / st1 / st1 / st1;"></div>
+                <div id="st2" style="grid-area: st2 / st2 / st2 / st2;"></div>
+                <div id="st3" style="grid-area: st3 / st3 / st3 / st3;"></div>
+                <div id="st4" style="grid-area: st4 / st4 / st4 / st4;"></div>
+                <div id="st5" style="grid-area: st5 / st5 / st5 / st5;"></div>
+                <div id="st6" style="grid-area: st6 / st6 / st6 / st6;"></div>
+                <div id="st7" style="grid-area: st7 / st7 / st7 / st7;"></div>
+                <div id="st8" style="grid-area: st8 / st8 / st8 / st8;"></div>
+                <div id="st9" style="grid-area: st9 / st9 / st9 / st9;"></div>
+                <div id="st10" style="grid-area: st10 / st10 / st10 / st10;"></div>
+                <div id="st11" style="grid-area: st11 / st11 / st11 / st11;"></div>
+              </div>
+              <div class="verts">
+                <div id="ve0" style="grid-area: ve0 / ve0 / ve0 / ve0;"></div>
+                <div id="ve1" style="grid-area: ve1 / ve1 / ve1 / ve1;"></div>
+                <div id="ve2" style="grid-area: ve2 / ve2 / ve2 / ve2;"></div>
+                <div id="ve3" style="grid-area: ve3 / ve3 / ve3 / ve3;"></div>
+                <div id="ve4" style="grid-area: ve4 / ve4 / ve4 / ve4;"></div>
+                <div id="ve5" style="grid-area: ve5 / ve5 / ve5 / ve5;"></div>
+                <div id="ve6" style="grid-area: ve6 / ve6 / ve6 / ve6;"></div>
+                <div id="ve7" style="grid-area: ve7 / ve7 / ve7 / ve7;"></div>
+                <div id="ve8" style="grid-area: ve8 / ve8 / ve8 / ve8;"></div>
+                <div id="ve9" style="grid-area: ve9 / ve9 / ve9 / ve9;"></div>
+                <div id="ve10" style="grid-area: ve10 / ve10 / ve10 / ve10;"></div>
+                <div id="ve11" style="grid-area: ve11 / ve11 / ve11 / ve11;"></div>
+                <div id="ve12" style="grid-area: ve12 / ve12 / ve12 / ve12;"></div>
+                <div id="ve13" style="grid-area: ve13 / ve13 / ve13 / ve13;"></div>
+                <div id="ve14" style="grid-area: ve14 / ve14 / ve14 / ve14;"></div>
+                <div id="ve15" style="grid-area: ve15 / ve15 / ve15 / ve15;"></div>
+                <div id="ve16" style="grid-area: ve16 / ve16 / ve16 / ve16;"></div>
+                <div id="ve17" style="grid-area: ve17 / ve17 / ve17 / ve17;"></div>
+                <div id="ve18" style="grid-area: ve18 / ve18 / ve18 / ve18;"></div>
+                <div id="ve19" style="grid-area: ve19 / ve19 / ve19 / ve19;"></div>
+                <div id="ve20" style="grid-area: ve20 / ve20 / ve20 / ve20;"></div>
+                <div id="ve21" style="grid-area: ve21 / ve21 / ve21 / ve21;"></div>
+                <div id="ve22" style="grid-area: ve22 / ve22 / ve22 / ve22;"></div>
+                <div id="ve23" style="grid-area: ve23 / ve23 / ve23 / ve23;"></div>
+              </div>
+              <div class="horiz">
+                <div id="ho0" style="grid-area: ho0 / ho0 / ho0 / ho0;"></div>
+                <div id="ho1" style="grid-area: ho1 / ho1 / ho1 / ho1;"></div>
+                <div id="ho2" style="grid-area: ho2 / ho2 / ho2 / ho2;"></div>
+                <div id="ho3" style="grid-area: ho3 / ho3 / ho3 / ho3;"></div>
+                <div id="ho4" style="grid-area: ho4 / ho4 / ho4 / ho4;"></div>
+                <div id="ho5" style="grid-area: ho5 / ho5 / ho5 / ho5;"></div>
+                <div id="ho6" style="grid-area: ho6 / ho6 / ho6 / ho6;"></div>
+                <div id="ho7" style="grid-area: ho7 / ho7 / ho7 / ho7;"></div>
+                <div id="ho8" style="grid-area: ho8 / ho8 / ho8 / ho8;"></div>
+                <div id="ho9" style="grid-area: ho9 / ho9 / ho9 / ho9;"></div>
+                <div id="ho10" style="grid-area: ho10 / ho10 / ho10 / ho10;"></div>
+                <div id="ho11" style="grid-area: ho11 / ho11 / ho11 / ho11;"></div>
+                <div id="ho12" style="grid-area: ho12 / ho12 / ho12 / ho12;"></div>
+                <div id="ho13" style="grid-area: ho13 / ho13 / ho13 / ho13;"></div>
+                <div id="ho14" style="grid-area: ho14 / ho14 / ho14 / ho14;"></div>
+                <div id="ho15" style="grid-area: ho15 / ho15 / ho15 / ho15;"></div>
+                <div id="ho16" style="grid-area: ho16 / ho16 / ho16 / ho16;"></div>
+                <div id="ho17" style="grid-area: ho17 / ho17 / ho17 / ho17;"></div>
+                <div id="ho18" style="grid-area: ho18 / ho18 / ho18 / ho18;"></div>
+                <div id="ho19" style="grid-area: ho19 / ho19 / ho19 / ho19;"></div>
+                <div id="ho20" style="grid-area: ho20 / ho20 / ho20 / ho20;"></div>
+                <div id="ho21" style="grid-area: ho21 / ho21 / ho21 / ho21;"></div>
+                <div id="ho22" style="grid-area: ho22 / ho22 / ho22 / ho22;"></div>
+                <div id="ho23" style="grid-area: ho23 / ho23 / ho23 / ho23;"></div>
+                <div id="ho24" style="grid-area: ho24 / ho24 / ho24 / ho24;"></div>
+                <div id="ho25" style="grid-area: ho25 / ho25 / ho25 / ho25;"></div>
+                <div id="ho26" style="grid-area: ho26 / ho26 / ho26 / ho26;"></div>
+                <div id="ho27" style="grid-area: ho27 / ho27 / ho27 / ho27;"></div>
+                <div id="ho28" style="grid-area: ho28 / ho28 / ho28 / ho28;"></div>
+                <div id="ho29" style="grid-area: ho29 / ho29 / ho29 / ho29;"></div>
+                <div id="ho30" style="grid-area: ho30 / ho30 / ho30 / ho30;"></div>
+                <div id="ho31" style="grid-area: ho31 / ho31 / ho31 / ho31;"></div>
+                <div id="ho32" style="grid-area: ho32 / ho32 / ho32 / ho32;"></div>
+                <div id="ho33" style="grid-area: ho33 / ho33 / ho33 / ho33;"></div>
+                <div id="ho34" style="grid-area: ho34 / ho34 / ho34 / ho34;"></div>
+                <div id="ho35" style="grid-area: ho35 / ho35 / ho35 / ho35;"></div>
+              </div>
+              <div class="squares">
+                <div id="sq0" style="grid-area: sq0 / sq0 / sq0 / sq0;"></div>
+                <div id="sq1" style="grid-area: sq1 / sq1 / sq1 / sq1;"></div>
+                <div id="sq2" style="grid-area: sq2 / sq2 / sq2 / sq2;"></div>
+                <div id="sq3" style="grid-area: sq3 / sq3 / sq3 / sq3;"></div>
+                <div id="sq4" style="grid-area: sq4 / sq4 / sq4 / sq4;"></div>
+                <div id="sq5" style="grid-area: sq5 / sq5 / sq5 / sq5;"></div>
+                <div id="sq6" style="grid-area: sq6 / sq6 / sq6 / sq6;"></div>
+                <div id="sq7" style="grid-area: sq7 / sq7 / sq7 / sq7;"></div>
+                <div id="sq8" style="grid-area: sq8 / sq8 / sq8 / sq8;"></div>
+                <div id="sq9" style="grid-area: sq9 / sq9 / sq9 / sq9;"></div>
+                <div id="sq10" style="grid-area: sq10 / sq10 / sq10 / sq10;"></div>
+                <div id="sq11" style="grid-area: sq11 / sq11 / sq11 / sq11;"></div>
+                <div id="sq12" style="grid-area: sq12 / sq12 / sq12 / sq12;"></div>
+                <div id="sq13" style="grid-area: sq13 / sq13 / sq13 / sq13;"></div>
+                <div id="sq14" style="grid-area: sq14 / sq14 / sq14 / sq14;"></div>
+                <div id="sq15" style="grid-area: sq15 / sq15 / sq15 / sq15;"></div>
+                <div id="sq16" style="grid-area: sq16 / sq16 / sq16 / sq16;"></div>
+                <div id="sq17" style="grid-area: sq17 / sq17 / sq17 / sq17;"></div>
+                <div id="sq18" style="grid-area: sq18 / sq18 / sq18 / sq18;"></div>
+                <div id="sq19" style="grid-area: sq19 / sq19 / sq19 / sq19;"></div>
+                <div id="sq20" style="grid-area: sq20 / sq20 / sq20 / sq20;"></div>
+                <div id="sq21" style="grid-area: sq21 / sq21 / sq21 / sq21;"></div>
+                <div id="sq22" style="grid-area: sq22 / sq22 / sq22 / sq22;"></div>
+                <div id="sq23" style="grid-area: sq23 / sq23 / sq23 / sq23;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="bet-select">
+            <div class="bet-option" :class="amount_select == 1 ? 'active':''" @click="select_bet(1)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#357f9c" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">1</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 5 ? 'active':''" @click="select_bet(5)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#aa2f2a" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">5</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 10 ? 'active':''" @click="select_bet(10)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#31ba9c" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">10</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 20 ? 'active':''" @click="select_bet(20)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#d40f83" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">20</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 50 ? 'active':''" @click="select_bet(50)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#412ebc" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">50</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 100 ? 'active':''" @click="select_bet(100)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#2d3b2c" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">100</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 500 ? 'active':''" @click="select_bet(500)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#993cae" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">500</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 1000 ? 'active':''" @click="select_bet(1000)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#d45c20" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">1K</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 2000 ? 'active':''" @click="select_bet(2000)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#cec440" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">2K</text></svg>
+              </div>
+            </div>
+            <div class="bet-option" :class="amount_select == 5000 ? 'active':''" @click="select_bet(5000)">
+              <div class="chip">
+                <svg viewBox="0 0 60 60"><circle opacity=".3" fill="#231F20" cx="30" cy="31" r="27.5"></circle><circle fill="#2c9e24" cx="30" cy="30" r="26.5"></circle><g fill="#FFF"><path d="M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z"></path></g><text fill="#FEFEFE" x="50%" y="50%" font-size="15" font-weight="500" text-anchor="middle" dy=".33em">5K</text></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="line">
+        <div class="left">
+          <div class="info">
+            <div class="balance">BALANCE<p><span class="padded">{{balance_zeros}}</span><span>{{balance_amount}}</span></p></div>
+            <div class="bet">BET<p><span class="padded">{{bet_zeros}}</span><span>{{bet_amount}}</span></p></div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="actions">
+            <button aria-label="Clear Board" @click="clear()">Clear</button>
+            <button aria-label="Undo" @click="undo()"><svg width="20" height="20"><g><path d="M9.926 2.622v16.002l-8-8.001z"></path><path d="M9 7.393v5.93c5.684.053 10.645 3.119 13.363 7.678l.002-.094c0-7.415-5.97-13.432-13.365-13.514z"></path></g></svg></button>
+            <button aria-label="Spin the Wheel" class="spin" @click="spin_wheel()"><svg viewBox="0 0 100 100" :class="{'ball-ani': spinning}"><circle class="hover" fill="rgba(0,0,0,0.1)" cx="50" cy="50" r="50" stroke-width="0"></circle><g transform="translate(5,5)"><path d="M87.954 47.938c-2.888 10.131-8.871 18.949-16.871 25.374a50.175 50.175 0 01-13.916 7.917h11.445c10.596-6.92 17.972-18.354 19.386-31.579-.009-.572-.015-1.145-.044-1.712zM21.388 8.771C10.792 15.692 3.417 27.126 2.002 40.35c.009.572.017 1.145.046 1.713 2.885-10.131 8.871-18.95 16.868-25.376a50.307 50.307 0 0113.917-7.916H21.388z"></path></g><circle fill="none" cx="50" cy="50" r="43.25" stroke-width="1"></circle><text x="50%" y="50%" text-anchor="middle" dy=".33em">Spin</text></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="line">
+        <div class="wallet-wrapper">
+          <div class="wallet-unit" @click.stop>
+            <div class="input-wrapper" v-if="deposit_visible">
+              <input v-model="deposit_text"/>
+            </div>
+            <button @click="toggle_deposit()">DEPOSIT</button>
+          </div>
+          <div class="wallet-unit" @click.stop>
+            <div class="input-wrapper" v-if="withdraw_visible">
+              <input v-model="withdraw_text"/>
+            </div>
+            <button @click="toggle_withdraw()">WITHDRAW</button>
+          </div>
+          <div>1 chip = 0.01 NEAR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Contract from '../contract'
+
+const CHIP_VALUES = [1, 5, 10, 20, 50, 100, 500, 1000, 2000, 5000];
+
+const COLORS = [
+  "#357f9c",
+  "#aa2f2a",
+  "#31ba9c",
+  "#d40f83",
+  "#412ebc",
+  "#2d3b2c",
+  "#993cae",
+  "#d45c20",
+  "#cec440",
+  "#2c9e24"
+];
+
+const DISPLAY_VALUES = {
+  1000: "1K",
+  2000: "2K",
+  5000: "5K"
+};
+
+const createMutateStyle = (top = 0, left = 0, deg = 0) => {
+  top = (top * 15).toFixed() + "%";
+  left = (left * 15).toFixed() + "%";
+  // top = "0%";
+  // left = "0%";
+  deg = (deg * 50).toFixed();
+  return {
+    top,
+    left,
+    transform: `rotate(${deg}deg)`
+  };
+};
+
+function Chip(height, width, value, style) {
+  const color = COLORS[CHIP_VALUES.indexOf(value)] || "black";
+  const text = DISPLAY_VALUES[value] || value;
+  return String.prototype.concat.call(
+    "<div className='chip' style='" + style + "'>",
+      "<svg height=" + height + " width=" + width + " viewBox='0 0 60 60'>",
+        "<circle opacity='.3' fill='#231F20' cx='30' cy='31' r='27.5' />",
+        "<circle fill=" + color +" cx='30' cy='30' r='26.5' />",
+        "<g fill='#FFF'>",
+          "<path d='M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z' />",
+        "</g>",
+        "<text fill='#FEFEFE' x='50%' y='50%' fontSize='15' fontWeight='500' textAnchor='middle' dy='.33em' style='text-anchor: middle;'>",
+          text,
+        "</text>",
+      "</svg>",
+    "<div>"
+  )
+}
+export default {
+  
+  data() {
+    return {
+      login: false,
+      accountId: '',
+      contract: {},
+      bets: [],
+      amount_select: 10,
+      balance_zeros: "000000",
+      balance_amount: 0,
+      bet_zeros: "000000",
+      bet_amount: 0,
+      next_round_timestamp: 0,
+      deposit_text: 100,
+      withdraw_text: 100,
+      deposit_visible: false,
+      withdraw_visible: false,
+      spinning: false,
+      win_number: -1,
+      wheelSpinCounter: 0,
+      lastPosition: 0
+    }
+  },
+
+  async mounted() {
+    this.contract = new Contract()
+    await this.contract.init()
+    this.accountId = await this.contract.get_account()
+    this.login = this.accountId ? true:false
+    this.init()
+    this.initBet()
+    this.update()
+    if (this.deal_href() == false) {
+      this.deal_storage()
+    }
+  },
+
+  methods: {
+    init() {
+      for (let i = 0; i <= 36; i ++) {
+        let div = document.getElementById('n' + i)
+        div.onclick = () => { this.bet(i, 5, div) }
+      }
+      for (let i = 0; i <= 2; i ++) {
+        let div = document.getElementById('x' + (i + 1))
+        div.onclick = () => { this.bet(i, 2, div) }
+      }
+      for (let i = 0; i <= 2; i ++) {
+        let div = document.getElementById('z' + (i + 1))
+        div.onclick = () => { this.bet(i, 1, div) }
+      }
+      document.getElementById('s').onclick = () => { this.bet(0, 3, document.getElementById('s')) }
+      document.getElementById('e').onclick = () => { this.bet(0, 4, document.getElementById('e')) }
+      document.getElementById('o').onclick = () => { this.bet(1, 4, document.getElementById('o')) }
+      document.getElementById('g').onclick = () => { this.bet(1, 3, document.getElementById('g')) }
+      document.getElementById('r').onclick = () => { this.bet(1, 0, document.getElementById('r')) }
+      document.getElementById('b').onclick = () => { this.bet(0, 0, document.getElementById('b')) }
+    },
+
+    initBet() {
+      // this.bets = localStorage.getItem("bets") || []
+      // if (this.bets) {
+      //   for (let i = 0; i < this.bets.length; i++) {
+      //     this.updateBet(this.bets[i])
+      //   }
+      // }
+    },
+
+    deal_href() {
+      let hash = this.$route.query.transactionHashes
+      let action = localStorage.getItem("action")
+      if (!hash || !action) {
+        let index = location.href.indexOf("?")
+        if (index > -1) {
+          location.href = location.href.substring(0, index)
+        }
+        return false
+      } 
+      localStorage.setItem("tx_hash", hash)
+      let index = location.href.indexOf("?")
+      if (index > -1) {
+        location.href = location.href.substring(0, index)
+      }
+      return true
+    },
+
+    async deal_storage() {
+      let action = localStorage.getItem("action")
+      let hash = localStorage.getItem("tx_hash")
+      if (!action || !hash) {
+        return
+      }
+      let result = await this.contract.get_result(hash)
+      if (action == "spin_wheel") {
+        this.clear()
+        this.editBet("0")
+        setTimeout(() => {
+          this.update()
+        }, 5000)
+        this.animation(result)
+      }
+      localStorage.removeItem("action")
+      localStorage.removeItem("tx_hash")
+    },
+
+    async update() {
+      if (this.login) {
+        let status = await this.contract.get_status()
+        let balance_str = this.contract.from_yocto(status.user.balance + "00")
+        balance_str = balance_str.replace(/,/g, "");
+        this.editBalance(balance_str)
+      }
+    },
+
+    sign_in() {
+      this.contract.sign_in()
+    },
+
+    sign_out() {
+      this.contract.sign_out()
+      this.editBalance("0")
+      this.login = false
+    },
+
+    editBalance(balance) {
+      this.balance_amount = Number(balance)
+      let zero_count = balance.length
+      this.balance_zeros = ""
+      for (let i = 0; i < 8 - zero_count; i++) {
+        this.balance_zeros += "0"
+      }
+    },
+
+    editBet(balance) {
+      this.bet_amount = Number(balance)
+      let zero_count = balance.length
+      this.bet_zeros = ""
+      for (let i = 0; i < 8 - zero_count; i++) {
+        this.bet_zeros += "0"
+      }
+    },
+
+    updateBet(bet) {
+      let css = createMutateStyle(0.5 - Math.random(), 0.5 - Math.random(), 0.5 - Math.random())
+      let style = "top: " + css.top + "; left: " + css.left + "; transform: " + css.transform
+      let node = document.createElement("div");
+      node.className = "placed-chips"
+      node.style = "position: absolute;width: 100%;height: 100%" + style
+      node.innerHTML = Chip(35, 35, bet.chips, style)
+      bet.child = node
+      bet.node.appendChild(node)
+    },
+
+    bet(number, bet_type, node) {
+      let bet = {
+        bet_type: bet_type,
+        number: number,
+        chips: this.amount_select,
+        node: node
+      }
+      this.updateBet(bet)
+      let bet_amount = this.bet_amount + this.amount_select
+      this.editBet(String(bet_amount))
+      this.bets.push(bet)
+      localStorage.setItem("bets", this.bets)
+      
+    },
+
+    undo() {
+      if (this.bets.length <= 0) {
+        return
+      }
+      let bet = this.bets[this.bets.length - 1]
+      bet.node.removeChild(bet.child)
+      this.editBet(String(this.bet_amount - bet.chips))
+      this.bets.splice(this.bets.length - 1, 1)
+    },
+
+    clear() {
+      for (let i = 0; i < this.bets.length; i++) {
+        let bet = this.bets[i]
+        bet.node.removeChild(bet.child)
+      }
+      this.bets = []
+    },
+
+    select_bet(amount) {
+      this.amount_select = amount
+    },
+
+    async spin_wheel() {
+      if (!this.login) {
+        this.sign_in()
+        return
+      }
+      if (this.bets.length == 0) {
+        return
+      }
+      
+      if (this.bet_amount <= this.balance_amount) {
+        this.spinning = true
+      } else {
+        localStorage.setItem("action", "spin_wheel")
+      }
+      this.win_number = await this.contract.spin_wheel(this.bets)
+      console.log(this.win_number)
+      if (this.bet_amount <= this.balance_amount) {
+        this.clear()
+        this.editBet("0")
+        setTimeout(() => {
+          this.update()
+        }, 5000)
+        this.animation(this.win_number)
+      }
+      this.spinning = false
+    },
+
+    async deposit(amount) {
+      if (!this.login) {
+        this.sign_in()
+        return
+      }
+      await this.contract.deposit(amount)
+      this.update()
+    },
+
+    async withdraw(amount) {
+      if (!this.login) {
+        this.sign_in()
+        return
+      }
+      await this.contract.withdraw(amount)
+      this.update()
+    },
+
+    toggle_deposit() {
+      this.deposit_visible = !this.deposit_visible
+      if (this.deposit_visible) {
+        this.withdraw_visible = false
+      } else {
+        this.deposit(Number(this.deposit_text))
+      }
+    },
+
+    toggle_withdraw() {
+      this.withdraw_visible = !this.withdraw_visible
+      if (this.withdraw_visible) {
+        this.withdraw_text = this.balance_amount
+        this.deposit_visible = false
+      } else {
+        this.withdraw(Number(this.withdraw_text))
+      }
+    },
+
+    clear_button() {
+      this.deposit_visible = false
+      this.withdraw_visible = false
+    },
+
+    animation(oneRandomNumber) {
+      /* listening for events from the smart contract */
+      this.wheelSpinCounter += 1;
+      /* get wheel element */
+      var wheel = document.getElementById("ball");
+      /* reset wheel */
+      // wheel.style.transformOrigin = "190px 190px"
+      // wheel.style.transitionDuration = "10s"
+      // wheel.style.transform = "rotate(" + this.lastPosition + "deg)";
+      
+      /* numbers in the wheel, ordered clockwise */
+      var numbers = [
+        0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27,
+        13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1,
+        20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+      ];
+      /* calculate how much do we need to rotate to have the random number chosen */
+      var numberDegree = numbers.indexOf(oneRandomNumber) * 360 / numbers.length;
+      /* add some rounds before to look like it's spinning */
+      var numRoundsBefore = 3 * this.wheelSpinCounter;
+      /* calculate total degrees we need to rotate */
+      var totalDegrees = (numRoundsBefore * 360) + numberDegree;
+      /* rotate the wheel */
+      
+      wheel.style.transform = "rotate(" + totalDegrees + "deg)";
+      
+      /* save position to be able to reset the wheel next time */
+      this.lastPosition = numberDegree;
+      /* show status on bets after wheel stops */
+    }
+
+  },
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+.index {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  background-color: green;
+  place-items: center;
+}
+
+.header {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 98%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.index-wrapper {
+  width: 100%;
+  height: 100%;
+  max-height: 30vh;
+  max-width: 1200px;
+}
+
+.line {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wheel {
+  position: relative;
+  width: 330px;
+  height: 330px;
+  max-width: 330px;
+  max-height: 330px;
+}
+
+.place-bet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+.wheel-base {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+.wheel text {
+    text-anchor: middle;
+    font-size: 19px;
+    fill: hsla(0,0%,100%,.9);
+    font-weight: 500;
+}
+
+.board-wrap {
+    border: 0px solid #fff !important;
+    font-size: 20px;
+}
+
+.board-wrap>div {
+    cursor: pointer!important;
+}
+
+.board {
+  width: 97vw;
+  max-width: 750px;
+  height: 34.64286vw;
+  max-height: 267.85714px;
+  display: grid;
+  grid-area: board1;
+  grid-template-columns: repeat(14,1fr);
+  grid-template-areas:
+      "n0 n3 n6 n9 n12 n15 n18 n21 n24 n27 n30 n33 n36 x3"
+      "n0 n2 n5 n8 n11 n14 n17 n20 n23 n26 n29 n32 n35 x2"
+      "n0 n1 n4 n7 n10 n13 n16 n19 n22 n25 n28 n31 n34 x1"
+      ". z1 z1 z1 z1 z2 z2 z2 z2 z3 z3 z3 z3 ."
+      ". s s e e r r b b o o g g .";
+  color: white;
+}
+
+.board>div {
+    display: grid;
+    position: relative;
+    place-items: center;
+    text-transform: uppercase;
+    border-top: 1px solid #fff;
+    border-right: 1px solid #fff;
+    z-index: 100;
+}
+
+.board>#n0, .board>#s, .board>#z1 {
+    border-left: 1px solid #fff;
+}
+.board>#b, .board>#e, .board>#g, .board>#n0, .board>#o, .board>#r, .board>#s, .board>#x1 {
+    border-bottom: 1px solid #fff;
+}
+
+#n1, #n4, #n7, #n10, #n13, #n16, #n19, #n22, #n25, #n28, #n31, #n34 {
+    box-shadow: 0 4px 0 rgb(0 0 0 / 20%);
+}
+
+.board .red {
+    background-color: #ec0230;
+}
+
+.board .black {
+    background-color: #2b2627;
+}
+
+.board #r polygon {
+    fill: #ec0230;
+    stroke: #fff;
+}
+
+.bet-select {
+    grid-area: chips;
+    margin: 9px;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(10,minmax(auto,68px));
+    grid-column-gap: 4px;
+    -webkit-justify-content: center;
+    justify-content: center;
+    place-items: center;
+}
+
+.bet-option.active {
+    -webkit-transform: translateY(-10px);
+    transform: translateY(-10px);
+}
+
+.bet-option {
+    transition: all .3s;
+}
+
+.bet-option, .chip {
+    width: 100%;
+}
+
+.bet-select .chip {
+    cursor: pointer;
+}
+
+.bet-option, .chip {
+    width: 100%;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  width: 330px;
+}
+
+.info>div {
+    min-width: 75px;
+}
+
+.info .padded {
+    opacity: .12;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.actions {
+    grid-area: actions;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    -webkit-justify-content: center;
+    justify-content: center;
+    place-items: center;
+}
+
+.actions button {
+    opacity: 1;
+    transition: opacity .15s;
+}
+
+button {
+    font-family: "Oswald",sans-serif;
+    border: none;
+    outline: 1px solid #fff;
+    outline-offset: -6px;
+    padding: 10px 21px;
+    margin: 0;
+    text-decoration: none;
+    text-transform: uppercase;
+    background: transparent;
+    color: #fff;
+    font-weight: 500;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    transition: background .25s ease-in-out,-webkit-transform .15s ease;
+    transition: background .25s ease-in-out,transform .15s ease;
+    transition: background .25s ease-in-out,transform .15s ease,-webkit-transform .15s ease;
+}
+
+button svg {
+    fill: #fff;
+}
+
+button.spin {
+    outline: none;
+    padding: 0;
+    font-weight: 500;
+    width: 60%;
+    font-size: 18px;
+}
+
+.board-wrap>div>div:hover{
+  background-color:orange
+}
+
+button:hover {
+  background: rgba(0,0,0,0.2)
+}
+
+.round {
+  border-radius: 50%;
+}
+
+.placed-chips {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.placed-chips .chip {
+    position: relative;
+    width: 5.5vw;
+    max-width: 30px;
+    height: 5.5vw;
+    max-height: 30px;
+}
+
+.chip text {
+    text-anchor: middle;
+    font-size: 19px;
+    fill: hsla(0,0%,100%,.9);
+    font-weight: 500;
+}
+
+.wallet-wrapper {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 90px;
+}
+
+.wallet-unit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-wrapper {
+  width: 200px;
+  
+  border: none;
+  outline: 1px solid #fff;
+  padding: 3px 21px;
+  margin: 0;
+  text-decoration: none;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.2);
+  cursor: pointer;
+  
+  transition: background .25s ease-in-out,transform .15s ease;
+}
+
+.input-wrapper input {
+    outline-color: invert;
+    outline-style: none;
+    outline-width: 0px;
+    border: none;
+    border-style: none;
+    text-shadow: none;
+    -webkit-appearance: none;
+    outline-color: transparent;
+    box-shadow: none;
+    background-color: transparent;
+    text-align: right;
+    width: 100%;
+    font-family: "Oswald",sans-serif;
+    font-weight: 400;
+    line-height: 11px;
+    color: #fff;
+    font-weight: 500;
+    font-size: 24px;
+}
+
+.spin-ani {
+  animation: spin 5s infinite normal linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.ball-ani {
+  animation: ball 1s infinite normal linear;
+}
+
+@keyframes ball {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+</style>
