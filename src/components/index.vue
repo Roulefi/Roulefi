@@ -479,8 +479,8 @@ export default {
     
     this.init()
     await this.initLogin()
-    this.update()
     this.initBet()
+    this.update()
     if (this.deal_href() == false) {
       this.deal_storage()
     }
@@ -521,6 +521,10 @@ export default {
 
     initBet() {
       let str = localStorage.getItem("bets")
+      let amount_select = Number(localStorage.getItem("amount_select"))
+      if (amount_select) {
+        this.amount_select = amount_select
+      }
       if (!str) {
         return
       }
@@ -579,7 +583,7 @@ export default {
           this.clear_ui()
           this.update()
           this.spinning = false
-        }, 7000)
+        }, 8000)
         this.animation(result)
       }
       localStorage.removeItem("action")
@@ -758,22 +762,58 @@ export default {
 
     select_bet(amount) {
       this.amount_select = amount
+      localStorage.setItem("amount_select", this.amount_select)
     },
 
     show_won(number) {
       let won = []
+      won.push(document.getElementById("n5" + number))
+      // won.push(document.getElementById("n4" + (number % 2)))
+      // let str = ''
+      // if (number <= 18) {
+      //   str = "n30"
+      // } else if (number >= 19) {
+      //   str = "n31"
+      // }
+      // won.push(document.getElementById(str))
+      // if (number <= 12) {
+      //   str = "n20"
+      // } else if (number > 12 && number <= 24) {
+      //   str = "n21"
+      // } else if (number > 24) {
+      //   str = "n22"
+      // }
+      // won.push(document.getElementById(str))
+      // if (number % 3 == 1) {
+      //   str = "n10"
+      // } else if (number % 3 == 2) {
+      //   str = "n11"
+      // } else if (number % 3 == 0) {
+      //   str = "n12"
+      // }
+      // won.push(document.getElementById(str))
+      // if (number <= 10 || number >= 20 && number <= 28) {
+      //   if (number % 2 == 0) {
+      //     str = "n00"
+      //   } else if (number % 2 == 1) {
+      //     str = "n01"
+      //   }
+      // }
+      // won.push(document.getElementById(str))
+
       for (let i = 0; i < this.last_bets.length; i ++) {
         let bet = this.last_bets[i]
         if (check_win(number, bet)) {
-          won.push(bet)
+          won.push(bet.node)
         }
       }
+
       for (let i = 0; i < won.length; i++) {
         let bet = won[i]
-        bet.node.style.backgroundColor = "orange"
+        bet.style.backgroundColor = "orange"
         setTimeout(() => {
-          bet.node.style.backgroundColor = ""
-        }, 2000)
+          bet.style.backgroundColor = ""
+        }, 3000)
       }
     },
 
@@ -801,7 +841,7 @@ export default {
           this.clear_ui()
           this.update()
           this.spinning = false
-        }, 7000)
+        }, 8000)
         this.animation(this.win_number)
       }
       
@@ -812,6 +852,7 @@ export default {
         this.sign_in()
         return
       }
+      this.editBalance(amount)
       await this.contract.deposit(amount)
       this.update()
     },
@@ -821,6 +862,7 @@ export default {
         this.sign_in()
         return
       }
+      this.editBalance(this.balance - amount)
       await this.contract.withdraw(amount)
       this.update()
     },
