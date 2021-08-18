@@ -98,57 +98,57 @@
           <div class="board">
             <div class="board-wrap">
               <div class="board">
-                <div id="n0" style="grid-area: n0 / n0 / n0 / n0;"><span>0</span></div>
-                <div id="n1" class="red" style="grid-area: n1 / n1 / n1 / n1;"><span>1</span></div>
-                <div id="n2" class="black" style="grid-area: n2 / n2 / n2 / n2;"><span>2</span></div>
-                <div id="n3" class="red" style="grid-area: n3 / n3 / n3 / n3;"><span>3</span></div>
-                <div id="n4" class="black" style="grid-area: n4 / n4 / n4 / n4;"><span>4</span></div>
-                <div id="n5" class="red" style="grid-area: n5 / n5 / n5 / n5;"><span>5</span></div>
-                <div id="n6" class="black" style="grid-area: n6 / n6 / n6 / n6;"><span>6</span></div>
-                <div id="n7" class="red" style="grid-area: n7 / n7 / n7 / n7;"><span>7</span></div>
-                <div id="n8" class="black" style="grid-area: n8 / n8 / n8 / n8;"><span>8</span></div>
-                <div id="n9" class="red" style="grid-area: n9 / n9 / n9 / n9;"><span>9</span></div>
-                <div id="n10" class="black" style="grid-area: n10 / n10 / n10 / n10;"><span>10</span></div>
-                <div id="n11" class="black" style="grid-area: n11 / n11 / n11 / n11;"><span>11</span></div>
-                <div id="n12" class="red" style="grid-area: n12 / n12 / n12 / n12;"><span>12</span></div>
-                <div id="n13" class="black" style="grid-area: n13 / n13 / n13 / n13;"><span>13</span></div>
-                <div id="n14" class="red" style="grid-area: n14 / n14 / n14 / n14;"><span>14</span></div>
-                <div id="n15" class="black" style="grid-area: n15 / n15 / n15 / n15;"><span>15</span></div>
-                <div id="n16" class="red" style="grid-area: n16 / n16 / n16 / n16;"><span>16</span></div>
-                <div id="n17" class="black" style="grid-area: n17 / n17 / n17 / n17;"><span>17</span></div>
-                <div id="n18" class="red" style="grid-area: n18 / n18 / n18 / n18;"><span>18</span></div>
-                <div id="n19" class="red" style="grid-area: n19 / n19 / n19 / n19;"><span>19</span></div>
-                <div id="n20" class="black" style="grid-area: n20 / n20 / n20 / n20;"><span>20</span></div>
-                <div id="n21" class="red" style="grid-area: n21 / n21 / n21 / n21;"><span>21</span></div>
-                <div id="n22" class="black" style="grid-area: n22 / n22 / n22 / n22;"><span>22</span></div>
-                <div id="n23" class="red" style="grid-area: n23 / n23 / n23 / n23;"><span>23</span></div>
-                <div id="n24" class="black" style="grid-area: n24 / n24 / n24 / n24;"><span>24</span></div>
-                <div id="n25" class="red" style="grid-area: n25 / n25 / n25 / n25;"><span>25</span></div>
-                <div id="n26" class="black" style="grid-area: n26 / n26 / n26 / n26;"><span>26</span></div>
-                <div id="n27" class="red" style="grid-area: n27 / n27 / n27 / n27;"><span>27</span></div>
-                <div id="n28" class="black" style="grid-area: n28 / n28 / n28 / n28;"><span>28</span></div>
-                <div id="n29" class="black" style="grid-area: n29 / n29 / n29 / n29;"><span>29</span></div>
-                <div id="n30" class="red" style="grid-area: n30 / n30 / n30 / n30;"><span>30</span></div>
-                <div id="n31" class="black" style="grid-area: n31 / n31 / n31 / n31;"><span>31</span></div>
-                <div id="n32" class="red" style="grid-area: n32 / n32 / n32 / n32;"><span>32</span></div>
-                <div id="n33" class="black" style="grid-area: n33 / n33 / n33 / n33;"><span>33</span></div>
-                <div id="n34" class="red" style="grid-area: n34 / n34 / n34 / n34;"><span>34</span></div>
-                <div id="n35" class="black" style="grid-area: n35 / n35 / n35 / n35;"><span>35</span></div>
-                <div id="n36" class="red" style="grid-area: n36 / n36 / n36 / n36;"><span>36</span></div>
-                <div id="x1" style="grid-area: x1 / x1 / x1 / x1;"><span>2:1</span></div>
-                <div id="x2" style="grid-area: x2 / x2 / x2 / x2;"><span>2:1</span></div>
-                <div id="x3" style="grid-area: x3 / x3 / x3 / x3;"><span>2:1</span></div>
-                <div id="z1" style="grid-area: z1 / z1 / z1 / z1;"><span>1ST 12</span></div>
-                <div id="z2" style="grid-area: z2 / z2 / z2 / z2;"><span>2ND 12</span></div>
-                <div id="z3" style="grid-area: z3 / z3 / z3 / z3;"><span>3RD 12</span></div>
-                <div id="s" style="grid-area: s / s / s / s;"><span>1-18</span></div>
-                <div id="e" style="grid-area: e / e / e / e;"><span>even</span></div>
-                <div id="o" style="grid-area: o / o / o / o;"><span>odd</span></div>
-                <div id="g" style="grid-area: g / g / g / g;"><span>19-36</span></div>
-                <div id="r" style="grid-area: r / r / r / r;">
+                <div id="n50" style="grid-area: n50 / n50 / n50 / n50;"><span>0</span></div>
+                <div id="n51" class="red" style="grid-area: n51 / n51 / n51 / n51;"><span>1</span></div>
+                <div id="n52" class="black" style="grid-area: n52 / n52 / n52 / n52;"><span>2</span></div>
+                <div id="n53" class="red" style="grid-area: n53 / n53 / n53 / n53;"><span>3</span></div>
+                <div id="n54" class="black" style="grid-area: n54 / n54 / n54 / n54;"><span>4</span></div>
+                <div id="n55" class="red" style="grid-area: n55 / n55 / n55 / n55;"><span>5</span></div>
+                <div id="n56" class="black" style="grid-area: n56 / n56 / n56 / n56;"><span>6</span></div>
+                <div id="n57" class="red" style="grid-area: n57 / n57 / n57 / n57;"><span>7</span></div>
+                <div id="n58" class="black" style="grid-area: n58 / n58 / n58 / n58;"><span>8</span></div>
+                <div id="n59" class="red" style="grid-area: n59 / n59 / n59 / n59;"><span>9</span></div>
+                <div id="n510" class="black" style="grid-area: n510 / n510 / n510 / n510;"><span>10</span></div>
+                <div id="n511" class="black" style="grid-area: n511 / n511 / n511 / n511;"><span>11</span></div>
+                <div id="n512" class="red" style="grid-area: n512 / n512 / n512 / n512;"><span>12</span></div>
+                <div id="n513" class="black" style="grid-area: n513 / n513 / n513 / n513;"><span>13</span></div>
+                <div id="n514" class="red" style="grid-area: n514 / n514 / n514 / n514;"><span>14</span></div>
+                <div id="n515" class="black" style="grid-area: n515 / n515 / n515 / n515;"><span>15</span></div>
+                <div id="n516" class="red" style="grid-area: n516 / n516 / n516 / n516;"><span>16</span></div>
+                <div id="n517" class="black" style="grid-area: n517 / n517 / n517 / n517;"><span>17</span></div>
+                <div id="n518" class="red" style="grid-area: n518 / n518 / n518 / n518;"><span>18</span></div>
+                <div id="n519" class="red" style="grid-area: n519 / n519 / n519 / n519;"><span>19</span></div>
+                <div id="n520" class="black" style="grid-area: n520 / n520 / n520 / n520;"><span>20</span></div>
+                <div id="n521" class="red" style="grid-area: n521 / n521 / n521 / n521;"><span>21</span></div>
+                <div id="n522" class="black" style="grid-area: n522 / n522 / n522 / n522;"><span>22</span></div>
+                <div id="n523" class="red" style="grid-area: n523 / n523 / n523 / n523;"><span>23</span></div>
+                <div id="n524" class="black" style="grid-area: n524 / n524 / n524 / n524;"><span>24</span></div>
+                <div id="n525" class="red" style="grid-area: n525 / n525 / n525 / n525;"><span>25</span></div>
+                <div id="n526" class="black" style="grid-area: n526 / n526 / n526 / n526;"><span>26</span></div>
+                <div id="n527" class="red" style="grid-area: n527 / n527 / n527 / n527;"><span>27</span></div>
+                <div id="n528" class="black" style="grid-area: n528 / n528 / n528 / n528;"><span>28</span></div>
+                <div id="n529" class="black" style="grid-area: n529 / n529 / n529 / n529;"><span>29</span></div>
+                <div id="n530" class="red" style="grid-area: n530 / n530 / n530 / n530;"><span>30</span></div>
+                <div id="n531" class="black" style="grid-area: n531 / n531 / n531 / n531;"><span>31</span></div>
+                <div id="n532" class="red" style="grid-area: n532 / n532 / n532 / n532;"><span>32</span></div>
+                <div id="n533" class="black" style="grid-area: n533 / n533 / n533 / n533;"><span>33</span></div>
+                <div id="n534" class="red" style="grid-area: n534 / n534 / n534 / n534;"><span>34</span></div>
+                <div id="n535" class="black" style="grid-area: n535 / n535 / n535 / n535;"><span>35</span></div>
+                <div id="n536" class="red" style="grid-area: n536 / n536 / n536 / n536;"><span>36</span></div>
+                <div id="n10" style="grid-area: n10 / n10 / n10 / n10;"><span>2:1</span></div>
+                <div id="n11" style="grid-area: n11 / n11 / n11 / n11;"><span>2:1</span></div>
+                <div id="n12" style="grid-area: n12 / n12 / n12 / n12;"><span>2:1</span></div>
+                <div id="n20" style="grid-area: n20 / n20 / n20 / n20;"><span>1ST 12</span></div>
+                <div id="n21" style="grid-area: n21 / n21 / n21 / n21;"><span>2ND 12</span></div>
+                <div id="n22" style="grid-area: n22 / n22 / n22 / n22;"><span>3RD 12</span></div>
+                <div id="n30" style="grid-area: n30 / n30 / n30 / n30;"><span>1-18</span></div>
+                <div id="n40" style="grid-area: n40 / n40 / n40 / n40;"><span>even</span></div>
+                <div id="n41" style="grid-area: n41 / n41 / n41 / n41;"><span>odd</span></div>
+                <div id="n31" style="grid-area: n31 / n31 / n31 / n31;"><span>19-36</span></div>
+                <div id="n01" style="grid-area: n01 / n01 / n01 / n01;">
                   <svg viewBox="0 0 100 50"><polygon points="50,0 100,25 50,50 0,25"></polygon></svg>
                 </div>
-                <div id="b" style="grid-area: b / b / b / b;">
+                <div id="n00" style="grid-area: n00 / n00 / n00 / n00;">
                   <svg viewBox="0 0 100 50"><polygon points="50,0 100,25 50,50 0,25"></polygon></svg>
               </div>
               </div>
@@ -320,6 +320,7 @@
         </div>
         <div class="right">
           <div class="actions">
+            <button aria-label="Clear Board" @click="rebet()">Rebet</button>
             <button aria-label="Clear Board" @click="clear()">Clear</button>
             <button aria-label="Undo" @click="undo()"><svg width="20" height="20"><g><path d="M9.926 2.622v16.002l-8-8.001z"></path><path d="M9 7.393v5.93c5.684.053 10.645 3.119 13.363 7.678l.002-.094c0-7.415-5.97-13.432-13.365-13.514z"></path></g></svg></button>
             <button aria-label="Spin the Wheel" class="spin" @click="spin_wheel()"><svg viewBox="0 0 100 100" :class="{'ball-ani': spinning}"><circle class="hover" fill="rgba(0,0,0,0.1)" cx="50" cy="50" r="50" stroke-width="0"></circle><g transform="translate(5,5)"><path d="M87.954 47.938c-2.888 10.131-8.871 18.949-16.871 25.374a50.175 50.175 0 01-13.916 7.917h11.445c10.596-6.92 17.972-18.354 19.386-31.579-.009-.572-.015-1.145-.044-1.712zM21.388 8.771C10.792 15.692 3.417 27.126 2.002 40.35c.009.572.017 1.145.046 1.713 2.885-10.131 8.871-18.95 16.868-25.376a50.307 50.307 0 0113.917-7.916H21.388z"></path></g><circle fill="none" cx="50" cy="50" r="43.25" stroke-width="1"></circle><text x="50%" y="50%" text-anchor="middle" dy=".33em">Spin</text></svg>
@@ -403,6 +404,47 @@ function Chip(height, width, value, style) {
     "<div>"
   )
 }
+
+function check_win(number, b) {
+    let won = false;
+    if (number == 0) {
+        won = b.bet_type == 5 && b.number == 0;                   /* bet on 0 */
+    } else {
+    if (b.bet_type == 5) { 
+        won = b.number == number;                              /* bet on number */
+    } else if (b.bet_type == 4) {
+        if (b.number == 0) { won = number % 2 == 0; }              /* bet on even */
+        if (b.number == 1) { won = number % 2 == 1; }              /* bet on odd */
+    } else if (b.bet_type == 3) {            
+        if (b.number == 0) { won = number <= 18; }                /* bet on low 18s */
+        if (b.number == 1) { won = number >= 19; }                 /* bet on high 18s */
+    } else if (b.bet_type == 2) {                               
+        if (b.number == 0) { won = number <= 12; }                 /* bet on 1st dozen */
+        if (b.number == 1) { won = number > 12 && number <= 24; }  /* bet on 2nd dozen */
+        if (b.number == 2) { won = number > 24; }                  /* bet on 3rd dozen */
+    } else if (b.bet_type == 1) {               
+        if (b.number == 0) { won = number % 3 == 1; }              /* bet on left column */
+        if (b.number == 1) { won = number % 3 == 2; }              /* bet on middle column */
+        if (b.number == 2) { won = number % 3 == 0; }              /* bet on right column */
+    } else if (b.bet_type == 0) {
+        if (b.number == 0) {                                     /* bet on black */
+          if (number <= 10 || number >= 20 && number <= 28) {
+              won = number % 2 == 0;
+          } else {
+              won = number % 2 == 1;
+          }
+        } else {                                                 /* bet on red */
+          if (number <= 10 || number >= 20 && number <= 28) {
+              won = number % 2 == 1;
+          } else {
+              won = number % 2 == 0;
+          }
+        }
+    }
+    }
+    return won
+}
+
 export default {
   
   data() {
@@ -411,11 +453,14 @@ export default {
       accountId: '',
       contract: {},
       bets: [],
+      last_bets: [],
       amount_select: 10,
       balance_zeros: "000000",
       balance_amount: 0,
+      balance: 0,
       bet_zeros: "000000",
       bet_amount: 0,
+      bet_val: 0,
       next_round_timestamp: 0,
       deposit_text: 100,
       withdraw_text: 100,
@@ -431,11 +476,11 @@ export default {
   async mounted() {
     this.contract = new Contract()
     await this.contract.init()
-    this.accountId = await this.contract.get_account()
-    this.login = this.accountId ? true:false
+    
     this.init()
-    this.initBet()
+    await this.initLogin()
     this.update()
+    this.initBet()
     if (this.deal_href() == false) {
       this.deal_storage()
     }
@@ -444,29 +489,56 @@ export default {
   methods: {
     init() {
       for (let i = 0; i <= 36; i ++) {
-        let div = document.getElementById('n' + i)
+        let div = document.getElementById('n5' + i)
         div.onclick = () => { this.bet(i, 5, div) }
       }
       for (let i = 0; i <= 2; i ++) {
-        let div = document.getElementById('x' + (i + 1))
+        let div = document.getElementById('n2' + i)
         div.onclick = () => { this.bet(i, 2, div) }
       }
       for (let i = 0; i <= 2; i ++) {
-        let div = document.getElementById('z' + (i + 1))
+        let div = document.getElementById('n1' + i)
         div.onclick = () => { this.bet(i, 1, div) }
       }
-      document.getElementById('s').onclick = () => { this.bet(0, 3, document.getElementById('s')) }
-      document.getElementById('e').onclick = () => { this.bet(0, 4, document.getElementById('e')) }
-      document.getElementById('o').onclick = () => { this.bet(1, 4, document.getElementById('o')) }
-      document.getElementById('g').onclick = () => { this.bet(1, 3, document.getElementById('g')) }
-      document.getElementById('r').onclick = () => { this.bet(1, 0, document.getElementById('r')) }
-      document.getElementById('b').onclick = () => { this.bet(0, 0, document.getElementById('b')) }
+      document.getElementById('n30').onclick = () => { this.bet(0, 3, document.getElementById('n30')) }
+      document.getElementById('n40').onclick = () => { this.bet(0, 4, document.getElementById('n40')) }
+      document.getElementById('n41').onclick = () => { this.bet(1, 4, document.getElementById('n41')) }
+      document.getElementById('n31').onclick = () => { this.bet(1, 3, document.getElementById('n31')) }
+      document.getElementById('n01').onclick = () => { this.bet(1, 0, document.getElementById('n01')) }
+      document.getElementById('n00').onclick = () => { this.bet(0, 0, document.getElementById('n00')) }
+    },
+
+    async initLogin() {
+      let login = localStorage.getItem("login")
+      let accountId = await this.contract.get_account()
+      this.login = login || accountId
+      if (this.login) {
+        localStorage.setItem("login", true)
+      } else {
+        localStorage.removeItem("login")
+      }
     },
 
     initBet() {
+      let str = localStorage.getItem("bets")
+      if (!str) {
+        return
+      }
+      let bets = str.split(",")
+      for (let i = 0; i < bets.length; i++) {
+        let bet_type = Number(bets[i].substring(0, 1))
+        let index = bets[i].indexOf("c")
+        let number = Number(bets[i].substring(1, index))
+        let node = document.getElementById("n" + bet_type + number)
+        let chips = Number(bets[i].substring(index + 1))
+        this.bet(number, bet_type, node, chips)
+      }
       // this.bets = localStorage.getItem("bets") || []
       // if (this.bets) {
+      //   console.log(this.bets)
       //   for (let i = 0; i < this.bets.length; i++) {
+      //     let bet = this.bets[i]
+      //     bet.node = document.getElementById("n" + String(bet.bet_type) + String(bet.number))
       //     this.updateBet(this.bets[i])
       //   }
       // }
@@ -498,11 +570,16 @@ export default {
       }
       let result = await this.contract.get_result(hash)
       if (action == "spin_wheel") {
-        this.clear()
-        this.editBet("0")
+        this.spinning = true
+        this.clear_spin()
         setTimeout(() => {
-          this.update()
+          this.show_won(result)
         }, 5000)
+        setTimeout(() => {
+          this.clear_ui()
+          this.update()
+          this.spinning = false
+        }, 7000)
         this.animation(result)
       }
       localStorage.removeItem("action")
@@ -524,26 +601,70 @@ export default {
 
     sign_out() {
       this.contract.sign_out()
-      this.editBalance("0")
+      this.editBalance(0)
       this.login = false
     },
 
     editBalance(balance) {
-      this.balance_amount = Number(balance)
-      let zero_count = balance.length
-      this.balance_zeros = ""
-      for (let i = 0; i < 8 - zero_count; i++) {
-        this.balance_zeros += "0"
+      this.balance = Number(balance)
+      let i = 0
+      let original_balance = this.balance_amount
+      let bet_amount = this.bet_val
+      let now_balance = this.balance - bet_amount
+      if (now_balance < 0) {
+        now_balance = 0
       }
+      let count = 10
+      let delta = Math.floor((now_balance - original_balance) / count)
+      if (delta < 1 && delta > -1) {
+        count = 1
+      }
+      let ani = () => {
+        i += 1
+        let amount = this.balance_amount + delta
+        this.balance_amount = amount < 0 ? 0:amount
+        if (i == count) {
+          this.balance_amount = now_balance
+        }
+        let zero_count = String(this.balance_amount).length
+        this.balance_zeros = ""
+        for (let i = 0; i < 8 - zero_count; i++) {
+          this.balance_zeros += "0"
+        }
+        if (i < count) {
+          setTimeout(ani, 50)
+        }
+      }
+      ani()
     },
 
     editBet(balance) {
-      this.bet_amount = Number(balance)
-      let zero_count = balance.length
-      this.bet_zeros = ""
-      for (let i = 0; i < 8 - zero_count; i++) {
-        this.bet_zeros += "0"
+      this.bet_val = Number(balance)
+      let original_balance = this.bet_amount
+      let now_balance = Number(balance)
+      let count = 10
+      let delta = Math.floor((now_balance - original_balance) / count)
+      if (delta < 1 && delta > -1) {
+        count = 1
       }
+      let i = 0
+      let ani = () => {
+        i += 1
+        let amount = this.bet_amount + delta
+        this.bet_amount = amount < 0 ? 0:amount
+        if (i == count) {
+          this.bet_amount = now_balance
+        }
+        let zero_count = String(this.bet_amount).length
+        this.bet_zeros = ""
+        for (let i = 0; i < 8 - zero_count; i++) {
+          this.bet_zeros += "0"
+        }
+        if (i < count) {
+          setTimeout(ani, 50)
+        }
+      }
+      ani()
     },
 
     updateBet(bet) {
@@ -557,41 +678,103 @@ export default {
       bet.node.appendChild(node)
     },
 
-    bet(number, bet_type, node) {
+    bet(number, bet_type, node, chips=this.amount_select) {
+      if (this.spinning) {
+        return
+      }
       let bet = {
         bet_type: bet_type,
         number: number,
-        chips: this.amount_select,
+        chips: chips,
         node: node
       }
       this.updateBet(bet)
-      let bet_amount = this.bet_amount + this.amount_select
-      this.editBet(String(bet_amount))
+      let bet_amount = this.bet_val + chips
+      this.editBet(bet_amount)
+      this.editBalance(this.balance)
       this.bets.push(bet)
-      localStorage.setItem("bets", this.bets)
+      let bet_save = []
+      for (let i = 0; i < this.bets.length; i++) {
+        bet_save.push(String(this.bets[i].bet_type) + String(this.bets[i].number) + "c" + String(this.bets[i].chips))
+      }
+      localStorage.setItem("bets", bet_save)
       
     },
 
+    rebet() {
+      for (let i = 0; i < this.last_bets.length; i++) {
+        let bet = this.last_bets[i]
+        this.bet(bet.number, bet.bet_type, bet.node, bet.chips)
+      }
+    },
+
     undo() {
+      if (this.spinning) {
+        return
+      }
       if (this.bets.length <= 0) {
         return
       }
       let bet = this.bets[this.bets.length - 1]
       bet.node.removeChild(bet.child)
-      this.editBet(String(this.bet_amount - bet.chips))
+      this.editBet(this.bet_val - bet.chips)
+      this.editBalance(this.balance)
       this.bets.splice(this.bets.length - 1, 1)
+      let bet_save = []
+      for (let i = 0; i < this.bets.length; i++) {
+        bet_save.push(String(this.bets[i].bet_type) + String(this.bets[i].number) + "c" + String(this.bets[i].chips))
+      }
+      localStorage.setItem("bets", bet_save)
     },
 
     clear() {
+      if (this.spinning) {
+        return
+      }
       for (let i = 0; i < this.bets.length; i++) {
         let bet = this.bets[i]
         bet.node.removeChild(bet.child)
       }
       this.bets = []
+      this.editBet(0)
+      this.editBalance(this.balance)
+      localStorage.removeItem("bets")
+    },
+
+    clear_spin() {
+      this.last_bets = []
+      Object.assign(this.last_bets, this.bets)
+      this.bets = []
+      localStorage.removeItem("bets")
+    },
+
+    clear_ui() {
+      for (let i = 0; i < this.last_bets.length; i++) {
+        let bet = this.last_bets[i]
+        bet.node.removeChild(bet.child)
+      }
+      this.editBet(0)
     },
 
     select_bet(amount) {
       this.amount_select = amount
+    },
+
+    show_won(number) {
+      let won = []
+      for (let i = 0; i < this.last_bets.length; i ++) {
+        let bet = this.last_bets[i]
+        if (check_win(number, bet)) {
+          won.push(bet)
+        }
+      }
+      for (let i = 0; i < won.length; i++) {
+        let bet = won[i]
+        bet.node.style.backgroundColor = "orange"
+        setTimeout(() => {
+          bet.node.style.backgroundColor = ""
+        }, 2000)
+      }
     },
 
     async spin_wheel() {
@@ -603,22 +786,25 @@ export default {
         return
       }
       
-      if (this.bet_amount <= this.balance_amount) {
+      if (this.bet_val <= this.balance) {
         this.spinning = true
-      } else {
-        localStorage.setItem("action", "spin_wheel")
       }
+      localStorage.setItem("action", "spin_wheel")
       this.win_number = await this.contract.spin_wheel(this.bets)
       console.log(this.win_number)
-      if (this.bet_amount <= this.balance_amount) {
-        this.clear()
-        this.editBet("0")
+      if (this.bet_val <= this.balance) {
+        this.clear_spin()
         setTimeout(() => {
+          this.show_won(this.win_number)
+        }, 5000);
+        setTimeout(() => {
+          this.clear_ui()
           this.update()
-        }, 5000)
+          this.spinning = false
+        }, 7000)
         this.animation(this.win_number)
       }
-      this.spinning = false
+      
     },
 
     async deposit(amount) {
@@ -790,11 +976,11 @@ export default {
   grid-area: board1;
   grid-template-columns: repeat(14,1fr);
   grid-template-areas:
-      "n0 n3 n6 n9 n12 n15 n18 n21 n24 n27 n30 n33 n36 x3"
-      "n0 n2 n5 n8 n11 n14 n17 n20 n23 n26 n29 n32 n35 x2"
-      "n0 n1 n4 n7 n10 n13 n16 n19 n22 n25 n28 n31 n34 x1"
-      ". z1 z1 z1 z1 z2 z2 z2 z2 z3 z3 z3 z3 ."
-      ". s s e e r r b b o o g g .";
+      "n50 n53 n56 n59 n512 n515 n518 n521 n524 n527 n530 n533 n536 n12"
+      "n50 n52 n55 n58 n511 n514 n517 n520 n523 n526 n529 n532 n535 n11"
+      "n50 n51 n54 n57 n510 n513 n516 n519 n522 n525 n528 n531 n534 n10"
+      ". n20 n20 n20 n20 n21 n21 n21 n21 n22 n22 n22 n22 ."
+      ". n30 n30 n40 n40 n01 n01 n00 n00 n41 n41 n31 n31 .";
   color: white;
 }
 
@@ -808,14 +994,14 @@ export default {
     z-index: 100;
 }
 
-.board>#n0, .board>#s, .board>#z1 {
+.board>#n50, .board>#n30, .board>#n20 {
     border-left: 1px solid #fff;
 }
-.board>#b, .board>#e, .board>#g, .board>#n0, .board>#o, .board>#r, .board>#s, .board>#x1 {
+.board>#n00, .board>#n40, .board>#n31, .board>#n50, .board>#n41, .board>#n01, .board>#n30, .board>#n10 {
     border-bottom: 1px solid #fff;
 }
 
-#n1, #n4, #n7, #n10, #n13, #n16, #n19, #n22, #n25, #n28, #n31, #n34 {
+#n51, #n54, #n57, #n510, #n513, #n516, #n519, #n522, #n525, #n528, #n531, #n534 {
     box-shadow: 0 4px 0 rgb(0 0 0 / 20%);
 }
 
@@ -827,7 +1013,7 @@ export default {
     background-color: #2b2627;
 }
 
-.board #r polygon {
+.board #n01 polygon {
     fill: #ec0230;
     stroke: #fff;
 }
@@ -890,7 +1076,7 @@ p {
 .actions {
     grid-area: actions;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     -webkit-justify-content: center;
     justify-content: center;
     place-items: center;
