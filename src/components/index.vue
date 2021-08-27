@@ -1,5 +1,7 @@
 <template>
   <div class="index" @click="clear_button()"> 
+    <div class="background">
+    </div>
     <div class="header">
       <div class="logo">
       </div>
@@ -330,7 +332,7 @@
           </div>
         </div>
       </div>
-      <div class="line">
+      <div class="line" style="padding-bottom: 100px">
         <div class="wallet-wrapper">
           <div class="wallet-unit" @click.stop>
             <div class="input-wrapper" v-if="deposit_visible">
@@ -963,9 +965,19 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  place-items: center;
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100vh;
   background-color: green;
-  place-items: center;
+  z-index: -1;
 }
 
 .header {

@@ -1,5 +1,7 @@
 <template>
   <div class="index" @click="clear_button()"> 
+    <div class="background">
+    </div>
     <div class="header">
       <div class="logo">
       </div>
@@ -233,9 +235,19 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  place-items: center;
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100vh;
   background-color: green;
-  place-items: center;
+  z-index: -1;
 }
 
 .header {
