@@ -10,7 +10,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "build:contract": "cd contract && cargo build --target wasm32-unknown-unknown --release",
-    "postbuild": "cp contract/target/wasm32-unknown-unknown/release/rust_counter_tutorial.wasm ./out/main.wasm",
+    "postbuild": "cp contract/target/wasm32-unknown-unknown/release/near_roulette.wasm ./out/main.wasm",
     "deploy:contract": "near deploy",
     "deploy:pages": "gh-pages -d src",
     "deploy": "yarn build && yarn deploy:contract",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "mint-ui": "^2.2.13",
     "near-api-js": "^0.27.0",
     "regenerator-runtime": "^0.13.5",
     "vue": "^2.6.11",

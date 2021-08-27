@@ -1,5 +1,5 @@
 [package]
-name = "rust-counter-tutorial"
+name = "near-roulette"
 version = "0.1.0"
 authors = ["Near Inc <hello@near.org>"]
 edition = "2018"
@@ -9,6 +9,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 near-sdk = "3.1.0"
+chrono = "0.4"
 
 [dev-dependencies]
 near-sdk-sim = "3.1.0"

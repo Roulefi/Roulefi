@@ -1,69 +1,35 @@
-//! This contract implements simple counter backed by storage on blockchain.
-//!
-//! The contract provides methods to [increment] / [decrement] counter and
-//! [get it's current value][get_num] or [reset].
-//!
-//! [increment]: struct.Counter.html#method.increment
-//! [decrement]: struct.Counter.html#method.decrement
-//! [get_num]: struct.Counter.html#method.get_num
-//! [reset]: struct.Counter.html#method.reset
+
 
 use std::collections::HashMap;
 use std::fmt::Debug;
 
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::serde::{Serialize, Deserialize};
-use near_sdk::{PanicOnDefault, Promise, env, near_bindgen};
+use near_sdk::{BlockHeight, PanicOnDefault, Promise, env, near_bindgen};
 use near_sdk::{AccountId};
 use near_sdk::json_types::{U128, U64};
 
 near_sdk::setup_alloc!();
 
+pub mod roulette;
+pub mod vault;
+use crate::roulette::*;
+use crate::vault::*;
 
-fn check_win(number:u8, b: &Bet) -> bool {
-    let mut won = false;
-    if number == 0 {
-        won = b.bet_type == 5 && b.number == 0;                   /* bet on 0 */
-    } else {
-    if b.bet_type == 5 { 
-        won = b.number == number;                              /* bet on number */
-    } else if b.bet_type == 4 {
-        if b.number == 0 { won = number % 2 == 0; }              /* bet on even */
-        if b.number == 1 { won = number % 2 == 1; }              /* bet on odd */
-    } else if b.bet_type == 3 {            
-        if b.number == 0 { won = number <= 18; }                /* bet on low 18s */
-        if b.number == 1 { won = number >= 19; }                 /* bet on high 18s */
-    } else if b.bet_type == 2 {                               
-        if b.number == 0 { won = number <= 12; }                 /* bet on 1st dozen */
-        if b.number == 1 { won = number > 12 && number <= 24; }  /* bet on 2nd dozen */
-        if b.number == 2 { won = number > 24; }                  /* bet on 3rd dozen */
-    } else if b.bet_type == 1 {               
-        if b.number == 0 { won = number % 3 == 1; }              /* bet on left column */
-        if b.number == 1 { won = number % 3 == 2; }              /* bet on middle column */
-        if b.number == 2 { won = number % 3 == 0; }              /* bet on right column */
-    } else if b.bet_type == 0 {
-        if b.number == 0 {                                     /* bet on black */
-        if number <= 10 || number >= 20 && number <= 28 {
-            won = number % 2 == 0;
-        } else {
-            won = number % 2 == 1;
-        }
-        } else {                                                 /* bet on red */
-        if number <= 10 || number >= 20 && number <= 28 {
-            won = number % 2 == 1;
-        } else {
-            won = number % 2 == 0;
-        }
-        }
+pub fn new_user() -> User {
+    User {
+        bets: Vec::new(),
+        balance: U128::from(0),
+        history_bets: Vec::new(),
+        stakes: Vec::new(),
     }
-    }
-    won
+    
 }
 
 
 #[near_bindgen]
 #[derive(PanicOnDefault, BorshDeserialize, BorshSerialize)]
-pub struct Roulette {
+pub struct Contract {
 
      /*
       bet_types are as follow:
@@ -83,197 +49,134 @@ pub struct Roulette {
         number: number
     */
     // See more data types at https://doc.rust-lang.org/book/ch03-02-data-types.html
-    max_amount_allowed: u128,
-    number_range: [u8; 6],
-    payouts: [u8; 6],
+    pub max_amount_allowed: u128,
+    pub amount_allowed_rate: f32,
+    pub number_range: [u8; 6],
+    pub payouts: [u8; 6],
+    pub min_lock_time: u32,
+    pub step_time: Vec<u32>,
+    pub step_rate: Vec<f32>,
+    pub treasury_rate: f32,
+    pub round_block_index: BlockHeight,
+    pub round_delta: BlockHeight,
+    pub round_index: BlockHeight,
 
-    next_round_timestamp: u64,
-    necessary_balance: u128,
-    users: HashMap<AccountId, User>
+    pub bet_users: Vec<AccountId>,
+    pub stake_users: Vec<AccountId>,
+    pub win_number: u8,
+    pub users: HashMap<AccountId, User>,
+    pub bet_amount: u128,
+    pub stake_amount: u128,
+    pub treasury_amount: u128,
+    pub profit_amount: u128,
 }
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug)]
 pub struct Status {
-    pub next_round_timestamp: U64,
     pub balance: U128,
+    pub bet_amount: U128,
+    pub max_bet_amount: U128,
+    pub stake_amount: U128,
     pub user: User
+}
+
+#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+#[derive(Debug)]
+pub struct RoundStatus {
+    pub current_block_index: BlockHeight,
+    pub round_index: BlockHeight,
+    pub next_round_block_index: BlockHeight,
+    pub bet_count: u32,
+    pub win_number: u8,
 }
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug, Clone)]
 pub struct User {
+    pub bets: Vec<Bet>,
     pub balance: U128,
-    pub history_bets: Vec<HistoryBet>
-}
-
-
-#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
-#[serde(crate = "near_sdk::serde")]
-#[derive(Debug, Clone)]
-pub struct Bet {
-    pub bet_type: u8,
-    pub number: u8,
-    pub chips: U128,
-}
-
-#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
-#[serde(crate = "near_sdk::serde")]
-#[derive(Debug, Clone)]
-pub struct HistoryBet {
-    pub bet_type: u8,
-    pub number: u8,
-    pub chips: U128,
-    pub win_chips: U128,
-    pub win_number: u8,
+    pub history_bets: Vec<HistoryBet>,
+    pub stakes: Vec<Stake>,
 }
 
 
 
 #[near_bindgen]
-impl Roulette {
+impl Contract {
     #[init]
     pub fn new() -> Self {
-        // assert!(env::state_read::<Self>().is_none(), "Already initialized");
+        assert!(env::state_read::<Self>().is_none(), "Already initialized");
         Self {
-            necessary_balance: 0,
-            next_round_timestamp: env::block_timestamp() as u64,
             payouts: [2,3,3,2,2,36],
             number_range: [1,2,2,1,1,36],
+            amount_allowed_rate: 0.1,
+            max_amount_allowed: (env::account_balance() as f64 * 0.1) as u128, /* 2 ether */
+            min_lock_time: 259200,
+            step_time: vec![0, 604800, 2592000],
+            step_rate: vec![0.0, 0.05, 0.2],
+            treasury_rate: 0.1,
+
+            bet_users: Vec::new(),
+            stake_users: Vec::new(),
+            win_number: 0,
             // bet_amount: 10000000000000000000000, /* 0.01 ether */
-            max_amount_allowed: 2000000000000000000000000, /* 2 ether */
-            users: HashMap::new()
+            
+            users: HashMap::new(),
+            bet_amount: 0,
+            stake_amount: 0,
+            treasury_amount: 0,
+            profit_amount: 0,
+            round_block_index: 0,
+            round_delta: 60,
+            round_index: 0,
         }
     }
-    
+
+    // #[init(ignore_state)]
+    // pub fn migrate_state(new_data: String) -> Self {
+    //     // Deserialize the state using the old contract structure.
+    //     let old_contract: OldContract = env::state_read().expect("Old state doesn't exist");
+    //     // Verify that the migration can only be done by the owner.
+    //     // This is not necessary, if the upgrade is done internally.
+    //     assert!(
+    //         env::predecessor_account_id() == old_contract.owner_id,
+    //         "Can only be called by the owner"
+    //     );
+
+    //     // Create the new contract using the data from the old contract.
+    //     Self { owner_id: old_contract.owner_id, data: old_contract.data, new_data }
+    // }
+
     pub fn get_status(&self, sender: AccountId) -> Status {
         let user = self.users.get(&sender);
-        let user = match user {
+        let user: User = match user {
             Some(v) => v.clone(),
-            None => User {
-                balance: U128::from(0),
-                history_bets: Vec::new()
-            } 
+            None => new_user()
         };
-        let status = Status {
-            next_round_timestamp: self.next_round_timestamp.into(),      // when can we play again
+        let status = Status {     // when can we play again
             balance: env::account_balance().into(),
+            bet_amount: U128::from(self.bet_amount),
+            max_bet_amount: U128::from(self.max_amount_allowed),
+            stake_amount: U128::from(self.stake_amount),
+            
             user: user
         };
         status
     }
 
-    #[payable]
-    pub fn spin_wheel(&mut self, bets: Vec<Bet>) -> u8 {
-        /* are we allowed to spin the wheel? */
-        assert!(env::block_timestamp() > self.next_round_timestamp, "too quick to spin");
-        let sender = env::predecessor_account_id();
-        let user = self.users.entry(sender.to_string()).or_insert(User {
-            balance: U128::from(0),
-            history_bets: Vec::new()
-        });
-        assert!(bets.len() > 0, "you have 0 bets");
-        let mut total:u128= 0;
-        for item in bets.iter() {
-            total += u128::from(item.chips);
-            assert!(item.bet_type <= 5);
-            assert!(item.number <= self.number_range[item.bet_type as usize]); 
+    pub fn get_round_status(&self) -> RoundStatus {
+        RoundStatus {
+            current_block_index: env::block_index(),
+            round_index: self.round_index,
+            next_round_block_index: (self.round_block_index + self.round_delta) as BlockHeight,
+            bet_count: self.bet_users.len() as u32,
+            win_number: self.win_number,
         }
-        let balance = u128::from(user.balance) + env::attached_deposit();
-        assert!(u128::from(balance) >= total, "not enough balance");
-        user.balance = U128::from(balance - total);
-
-        /* are there any bets? */
-        /* next time we are allowed to spin the wheel again */
-        self.next_round_timestamp = env::block_timestamp() as u64;
-        /* calculate 'random' number */
-        let hash = env::sha256(&env::random_seed());
-        let mut hash_bytes: [u8;4] = [0;4];
-        for i in 0..4 {
-            hash_bytes[i] = hash.get(i).unwrap().clone();
-        }
-        let hash_number = u32::from_be_bytes(hash_bytes);
-        let number: u8 = hash_number as u8 % 37 ;
-        /* check every bet for this number */
-        
-        for b in bets.iter() {
-            let won = check_win(number, b);
-            /* if winning bet, add to player balance balance */
-            if won {
-                let win_chips = self.payouts[b.bet_type as usize] as u128 * u128::from(b.chips);
-                user.balance = U128::from(u128::from(user.balance) + win_chips);
-                user.history_bets.push(HistoryBet{
-                    bet_type: b.bet_type,
-                    number: b.number,
-                    chips: b.chips,
-                    win_chips: U128::from(win_chips),
-                    win_number: number,
-                });
-            } else {
-                user.history_bets.push(HistoryBet{
-                    bet_type: b.bet_type,
-                    number: b.number,
-                    chips: b.chips,
-                    win_chips: U128::from(0),
-                    win_number: number,
-                });
-            }
-        }
-        /* reset necessary_balance */
-        // self.necessary_balance = 0;
-        /* check if to much money in the bank */
-        // if env::account_balance() > self.max_amount_allowed {
-        //     //self.take_profits();
-        // }
-        number
-        /* returns 'random' number to UI */
-        // emit RandomNumber(number);
     }
-
-    #[payable]
-    pub fn deposit(&mut self, amount: U128) {
-        let sender = env::predecessor_account_id();
-        let user = self.users.entry(sender.to_string()).or_insert(User {
-            balance: U128::from(0),
-            history_bets: Vec::new()
-        });
-        assert!(u128::from(amount) > 0, "not enough amount!");
-        assert!(u128::from(amount) <= env::attached_deposit(), "not enough balance!");
-        user.balance = U128::from(u128::from(user.balance) + u128::from(amount));
-    }
-
-    pub fn withdraw(&mut self, amount: U128) {
-        let sender = env::predecessor_account_id();
-        let user = self.users.get_mut(&sender).unwrap();
-        let amount = u128::from(amount);
-        assert!(amount <= u128::from(user.balance), "not enough balance");
-        assert!(amount > 0, "not enough amount!");
-        assert!(amount <= env::account_balance(), "not enough balance!");
-        Promise::new(sender.to_string()).transfer(amount.clone());
-        user.balance = U128::from(u128::from(user.balance) - amount);
-    }
-      
-    pub fn take_profits(&self) {
-        assert_eq!(
-            env::current_account_id(),
-            env::predecessor_account_id(),
-            "Can only be called by owner"
-        );
-        let amount: u128 = env::account_balance() - self.max_amount_allowed;
-        if amount > 0 {
-            //Pcreator.transfer(amount);
-        }
-
-        //Promise::new(env::current_account_id()).into();
-    }
-    
-    // pub fn creatorKill() {
-    //     assert!(msg.sender == creator);
-    //     selfdestruct(creator);
-    // }
-
 
 }
 
@@ -322,7 +225,7 @@ mod tests {
         let context = get_context();
         testing_env!(context);
         // instantiate a contract variable with the counter at zero
-        let mut contract = Roulette::new();
+        let mut contract = Contract::new();
         let bets: Vec<Bet> = vec![Bet {
             bet_type: 5,
             number: 0,
@@ -333,7 +236,7 @@ mod tests {
         // let bets = 
         // //println!("Value after increment: {}", U128::from(contract.get_status().balance));
         // // confirm that we received 1 when calling get_num
-        let number = contract.spin_wheel(bets);
+        let number = 0;//contract.spin_wheel(bets);
         println!("{}", number);
     }
 }

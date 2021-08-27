@@ -4,7 +4,8 @@
       <div class="logo">
       </div>
       <div class="login">
-        <button @click="sign_out()" v-if="login">SIGNOUT</button>
+        <button @click="to_stake()" v-if="login">STAKE</button>
+        <button @click="sign_out()" v-if="login">SIGNOUT</button> 
         <button @click="sign_in()" v-if="!login">SIGNIN</button>
       </div>
     </div>
@@ -90,7 +91,7 @@
               </svg>
             </div>
             <div class="wheel-base">
-              <svg viewBox="0 0 380 380"><circle class="text" cx="190" cy="190" r="52" stroke-width="0" fill="rgba(0,0,0,0.2)"></circle><text text-anchor="middle" width="380" x="190" y="187" font-size="18" stroke-width="0">PLACE</text><text text-anchor="middle" width="380" x="190" y="207" font-size="18" stroke-width="0">BET</text></svg>
+              <svg viewBox="0 0 380 380"><circle class="text" cx="190" cy="190" r="52" stroke-width="0" fill="rgba(0,0,0,0.2)"></circle><text text-anchor="middle" width="380" x="190" y="195" font-size="90px" stroke-width="10px">{{remain_time}}</text></svg>
             </div>
           </div>
         </div>
@@ -323,8 +324,9 @@
             <button aria-label="Clear Board" @click="rebet()">Rebet</button>
             <button aria-label="Clear Board" @click="clear()">Clear</button>
             <button aria-label="Undo" @click="undo()"><svg width="20" height="20"><g><path d="M9.926 2.622v16.002l-8-8.001z"></path><path d="M9 7.393v5.93c5.684.053 10.645 3.119 13.363 7.678l.002-.094c0-7.415-5.97-13.432-13.365-13.514z"></path></g></svg></button>
-            <button aria-label="Spin the Wheel" class="spin" @click="spin_wheel()"><svg viewBox="0 0 100 100" :class="{'ball-ani': spinning}"><circle class="hover" fill="rgba(0,0,0,0.1)" cx="50" cy="50" r="50" stroke-width="0"></circle><g transform="translate(5,5)"><path d="M87.954 47.938c-2.888 10.131-8.871 18.949-16.871 25.374a50.175 50.175 0 01-13.916 7.917h11.445c10.596-6.92 17.972-18.354 19.386-31.579-.009-.572-.015-1.145-.044-1.712zM21.388 8.771C10.792 15.692 3.417 27.126 2.002 40.35c.009.572.017 1.145.046 1.713 2.885-10.131 8.871-18.95 16.868-25.376a50.307 50.307 0 0113.917-7.916H21.388z"></path></g><circle fill="none" cx="50" cy="50" r="43.25" stroke-width="1"></circle><text x="50%" y="50%" text-anchor="middle" dy=".33em">Spin</text></svg>
-            </button>
+            <button aria-label="Clear Board" @click="bet_submit()" :disabled="bet_disabled">BET</button>
+            <!-- <button aria-label="Spin the Wheel" class="spin" @click="spin_wheel()"><svg viewBox="0 0 100 100" :class="{'ball-ani': spinning}"><circle class="hover" fill="rgba(0,0,0,0.1)" cx="50" cy="50" r="50" stroke-width="0"></circle><g transform="translate(5,5)"><path d="M87.954 47.938c-2.888 10.131-8.871 18.949-16.871 25.374a50.175 50.175 0 01-13.916 7.917h11.445c10.596-6.92 17.972-18.354 19.386-31.579-.009-.572-.015-1.145-.044-1.712zM21.388 8.771C10.792 15.692 3.417 27.126 2.002 40.35c.009.572.017 1.145.046 1.713 2.885-10.131 8.871-18.95 16.868-25.376a50.307 50.307 0 0113.917-7.916H21.388z"></path></g><circle fill="none" cx="50" cy="50" r="43.25" stroke-width="1"></circle><text x="50%" y="50%" text-anchor="middle" dy=".33em">Spin</text></svg>
+            </button> -->
           </div>
         </div>
       </div>
@@ -461,15 +463,22 @@ export default {
       bet_zeros: "000000",
       bet_amount: 0,
       bet_val: 0,
-      next_round_timestamp: 0,
       deposit_text: 100,
       withdraw_text: 100,
       deposit_visible: false,
       withdraw_visible: false,
       spinning: false,
-      win_number: -1,
+      win_number: 0,
       wheelSpinCounter: 0,
-      lastPosition: 0
+      lastPosition: 0,
+      interval: {},
+      time_interval: {},
+      round_index: 0,
+      remain_time: 0,
+      next_round_block_index: 0,
+      current_block_index: 0,
+      waiting: false,
+      bet_disabled: false
     }
   },
 
@@ -481,9 +490,13 @@ export default {
     await this.initLogin()
     this.initBet()
     this.update()
-    if (this.deal_href() == false) {
-      this.deal_storage()
-    }
+    this.deal_href()
+    this.wait_for_spin()
+  },
+
+  async destroyed() {
+    clearInterval(this.interval)
+    clearInterval(this.time_interval)
   },
 
   methods: {
@@ -519,6 +532,10 @@ export default {
       }
     },
 
+    to_stake() {
+      this.$router.push('stake')
+    },
+
     initBet() {
       let str = localStorage.getItem("bets")
       let amount_select = Number(localStorage.getItem("amount_select"))
@@ -548,17 +565,45 @@ export default {
       // }
     },
 
+    async wait_for_spin() {
+      let round_status = await this.contract.get_round_status()
+      this.win_number = round_status.win_number
+      this.round_index = round_status.round_index
+      this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
+      this.remain_time = this.remain_time < 0 ? 0:this.remain_time
+      this.animation(this.win_number, true)
+
+      this.interval = setInterval(async () => {
+        if (this.waiting) {
+          return
+        }
+        this.waiting = true
+        let round_status = await this.contract.get_round_status()
+        if (round_status.round_index != this.round_index) {
+          this.win_number = round_status.win_number
+          this.round_index = round_status.round_index
+          this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
+          this.remain_time = this.remain_time < 0 ? 0:this.remain_time
+          this.spin_wheel()
+        }
+        this.waiting = false
+      }, 1000)
+
+      this.time_interval = setInterval(() => {
+        this.remain_time -= 1
+        this.remain_time = this.remain_time < 0 ? 0:this.remain_time
+      }, 1000);
+    },
+
     deal_href() {
       let hash = this.$route.query.transactionHashes
-      let action = localStorage.getItem("action")
-      if (!hash || !action) {
+      if (!hash) {
         let index = location.href.indexOf("?")
         if (index > -1) {
           location.href = location.href.substring(0, index)
         }
         return false
       } 
-      localStorage.setItem("tx_hash", hash)
       let index = location.href.indexOf("?")
       if (index > -1) {
         location.href = location.href.substring(0, index)
@@ -566,36 +611,15 @@ export default {
       return true
     },
 
-    async deal_storage() {
-      let action = localStorage.getItem("action")
-      let hash = localStorage.getItem("tx_hash")
-      if (!action || !hash) {
-        return
-      }
-      let result = await this.contract.get_result(hash)
-      if (action == "spin_wheel") {
-        this.spinning = true
-        this.clear_spin()
-        setTimeout(() => {
-          this.show_won(result)
-        }, 5000)
-        setTimeout(() => {
-          this.clear_ui()
-          this.update()
-          this.spinning = false
-        }, 8000)
-        this.animation(result)
-      }
-      localStorage.removeItem("action")
-      localStorage.removeItem("tx_hash")
-    },
-
     async update() {
       if (this.login) {
         let status = await this.contract.get_status()
+        console.log(status)
+        this.status = status
         let balance_str = this.contract.from_yocto(status.user.balance + "00")
         balance_str = balance_str.replace(/,/g, "");
         this.editBalance(balance_str)
+        this.win_number = status.win_number
       }
     },
 
@@ -613,8 +637,7 @@ export default {
       this.balance = Number(balance)
       let i = 0
       let original_balance = this.balance_amount
-      let bet_amount = this.bet_val
-      let now_balance = this.balance - bet_amount
+      let now_balance = this.balance
       if (now_balance < 0) {
         now_balance = 0
       }
@@ -692,8 +715,8 @@ export default {
         chips: chips,
         node: node
       }
-      this.updateBet(bet)
       let bet_amount = this.bet_val + chips
+      this.updateBet(bet)
       this.editBet(bet_amount)
       this.editBalance(this.balance)
       this.bets.push(bet)
@@ -702,7 +725,21 @@ export default {
         bet_save.push(String(this.bets[i].bet_type) + String(this.bets[i].number) + "c" + String(this.bets[i].chips))
       }
       localStorage.setItem("bets", bet_save)
-      
+    },
+
+    async bet_submit() {
+      if (this.spinning) {
+        return
+      }
+      this.bet_disabled = true
+      try {
+        await this.contract.bet(this.bets)
+        window.alert("Bet Success");
+      } catch {
+        window.alert("Transaction Expired");
+      }
+      this.bet_disabled = false
+      this.update()
     },
 
     rebet() {
@@ -818,32 +855,20 @@ export default {
     },
 
     async spin_wheel() {
-      if (!this.login) {
-        this.sign_in()
+      if (this.spinning) {
         return
       }
-      if (this.bets.length == 0) {
-        return
-      }
-      
-      if (this.bet_val <= this.balance) {
-        this.spinning = true
-      }
-      localStorage.setItem("action", "spin_wheel")
-      this.win_number = await this.contract.spin_wheel(this.bets)
-      console.log(this.win_number)
-      if (this.bet_val <= this.balance) {
-        this.clear_spin()
-        setTimeout(() => {
-          this.show_won(this.win_number)
-        }, 5000);
-        setTimeout(() => {
-          this.clear_ui()
-          this.update()
-          this.spinning = false
-        }, 8000)
-        this.animation(this.win_number)
-      }
+      this.spinning = true
+      this.clear_spin()
+      setTimeout(() => {
+        this.show_won(this.win_number)
+      }, 5000);
+      setTimeout(() => {
+        this.clear_ui()
+        this.update()
+        this.spinning = false
+      }, 8000)
+      this.animation(this.win_number)
       
     },
 
@@ -891,7 +916,7 @@ export default {
       this.withdraw_visible = false
     },
 
-    animation(oneRandomNumber) {
+    animation(oneRandomNumber, init=false) {
       /* listening for events from the smart contract */
       this.wheelSpinCounter += 1;
       /* get wheel element */
@@ -914,6 +939,11 @@ export default {
       /* calculate total degrees we need to rotate */
       var totalDegrees = (numRoundsBefore * 360) + numberDegree;
       /* rotate the wheel */
+      if (init) {
+        wheel.style.transitionDuration = "0s"
+      } else {
+        wheel.style.transitionDuration = "5s"
+      }
       
       wheel.style.transform = "rotate(" + totalDegrees + "deg)";
       
