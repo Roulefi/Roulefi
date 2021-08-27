@@ -20,10 +20,10 @@
       <div class="line" style="justify-content: center" v-for="(item, i) in stakes" :key="i">
         <div class="stake-wrapper">
           <div class="stake" style="margin-right: 30px">
-            AMOUNT: {{contract.from_yocto(item.amount)}}
+            AMOUNT: {{Number(contract.from_yocto(item.amount)).toFixed(2)}}
           </div>
           <div class="stake" style="margin-right: 30px">
-            PROFIT: {{contract.from_yocto(item.profit)}}
+            PROFIT: {{Number(contract.from_yocto(item.profit)).toFixed(2)}}
           </div>
           <div class="wallet-unit" @click.stop>
             <div class="input-wrapper" v-if="unstake_visible[i]">
