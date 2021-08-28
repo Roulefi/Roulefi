@@ -34,8 +34,11 @@ pub struct Stake {
 #[near_bindgen]
 impl Contract {
 
+    /*
+    stake near to pool
+    */
     #[payable]
-    pub fn stake(&mut self, amount: U128) {
+    pub fn stake(&mut self, amount: U128) {                        
         let sender = env::predecessor_account_id();
         let user = self.users.entry(sender.to_string()).or_insert(new_user());
         let amount = u128::from(amount);
@@ -54,6 +57,9 @@ impl Contract {
         self.max_amount_allowed = ((self.stake_amount + self.profit_amount) as f64 * self.amount_allowed_rate as f64) as u128
     }
 
+    /*
+    unstake from pool
+    */
     pub fn unstake(&mut self, amount: U128, index: usize) {
         let sender = env::predecessor_account_id();
         let user = self.users.get_mut(&sender).unwrap();
@@ -61,6 +67,7 @@ impl Contract {
         let stake = user.stakes.get_mut(index).unwrap();
         let now = env::block_timestamp();
         
+        assert!(u64::from(stake.time) < u64::from(env::block_timestamp()), "in lock period");
         assert!(amount <= u128::from(stake.amount.clone()), "not enough balance");
         assert!(amount > 0, "not enough amount!");
         assert!(amount <= env::account_balance(), "not enough balance!");
@@ -80,6 +87,9 @@ impl Contract {
         self.max_amount_allowed = ((self.stake_amount + self.profit_amount) as f64 * self.amount_allowed_rate as f64) as u128
     }
 
+    /*
+    profits doesn't compund to stakes, it needs to harvest manually
+    */
     pub fn harvest(&mut self, index: usize) {
         let sender = env::predecessor_account_id();
         let user = self.users.get_mut(&sender).unwrap();
@@ -92,14 +102,59 @@ impl Contract {
         self.max_amount_allowed = ((self.stake_amount + self.profit_amount) as f64 * self.amount_allowed_rate as f64) as u128
     }
 
+    pub fn treasury(&mut self) {
+        assert!(self.last_treasury_time < env::block_timestamp(), "too quick for treasury");
+        assert!(self.treasury_amount > self.treasury_threshold, "not enough treasury");
+        let gamers_amount = self.treasury_amount as f64 * self.treasury_shares[0] as f64;
+        let stakers_amount = self.treasury_amount as f64 * self.treasury_shares[1] as f64;
+        let team_amount = self.treasury_amount as f64 * self.treasury_shares[2] as f64;
+        let mut users_count = 0;
+        for (_, user) in self.users.iter() {
+            if user.history_bets.len() == 0 {
+                continue;
+            }
+            let last_bet = user.history_bets.get(user.history_bets.len() - 1).unwrap();
+            if u64::from(last_bet.time) > self.last_treasury_time {
+                users_count += 1
+            }
+        }
+        let each_gamer_amount = (gamers_amount as f64 / users_count as f64) as u128;
+        for (_, user) in self.users.iter_mut() {
+            if user.history_bets.len() > 0 {
+                user.balance = U128::from(u128::from(user.balance) + each_gamer_amount);
+            }
+            for stake in user.stakes.iter_mut() {
+                let time_delta = env::block_timestamp() - u64::from(stake.time);
+                let mut time_rate = 1.0;
+                for (i, time)in self.step_time.iter().enumerate() {
+                    if time_delta > *time as u64 {
+                        time_rate = 1 as f32 + self.step_rate[i];
+                        break;
+                    }
+                }
+                let rate = u128::from(stake.amount) as f64 * time_rate as f64 / u128::from(self.stake_amount) as f64;
+                let profit = (stakers_amount as f64 * rate) as u128;
+                stake.profit = U128::from(u128::from(stake.profit) + profit);
+            }
+        }
+
+        Promise::new(self.creator.clone()).transfer(team_amount as u128);
+
+        self.treasury_amount = 0;
+        self.last_treasury_time = env::block_timestamp();
+    }
+
 }
 
 impl Contract {
+    /*
+    profit needs to calculate every round
+    */
     pub(crate) fn cal_profit(&mut self, total_bet: u128, total_win:u128) {
         if u128::from(self.profit_amount) + total_bet > total_win {
-            self.profit_amount = self.profit_amount + total_bet - total_win;
+            self.profit_amount = self.profit_amount + total_bet - total_win;  // deal with total profit
         } else {
-            let delta = total_win - total_bet - u128::from(self.profit_amount);
+            let delta = total_win - total_bet - u128::from(self.profit_amount);  // if pool lose, decrease pool staking amount
             self.profit_amount = 0;
             self.stake_amount = self.stake_amount - delta;
         }
@@ -110,14 +165,14 @@ impl Contract {
         }
         else {
             delta = total_bet - total_win;
-            let treasury_amount = (delta as f64 * self.treasury_rate as f64) as u128;
+            let treasury_amount = (delta as f64 * self.treasury_rate as f64) as u128;   // deal with treasury
             self.treasury_amount = self.treasury_amount + treasury_amount;
             delta = delta - treasury_amount;
         }
 
         let now = env::block_timestamp();
         let new_user = &mut new_user();
-        for key in self.stake_users.iter() {
+        for key in self.stake_users.iter() {                                           // deal with each stake
             let user: &mut User = self.users.get_mut(key).unwrap_or(new_user);
             for stake in user.stakes.iter_mut() {
                 let time_delta = now - u64::from(stake.time);
@@ -130,9 +185,9 @@ impl Contract {
                 }
                 let rate = u128::from(stake.amount) as f64 * time_rate as f64 / u128::from(self.stake_amount) as f64;
                 let delta_with_rate = (delta as f64 * rate) as u128;
-                if total_bet < total_win {
+                if total_bet < total_win {                                                  //when pool lose
                     if u128::from(stake.profit) > delta_with_rate {
-                        stake.profit = U128::from(u128::from(stake.profit) - delta_with_rate);
+                        stake.profit = U128::from(u128::from(stake.profit) - delta_with_rate);  
                     } else {
                         delta = delta_with_rate - u128::from(stake.profit);
                         stake.profit = U128::from(0);
@@ -140,12 +195,12 @@ impl Contract {
                     }
                 }
                 else {
-                    stake.profit = U128::from(u128::from(stake.profit) + delta_with_rate);
+                    stake.profit = U128::from(u128::from(stake.profit) + delta_with_rate);   // add profit directly
                 }
                 
             }
         }
-        self.max_amount_allowed = ((self.stake_amount + self.profit_amount) as f64 * self.amount_allowed_rate as f64) as u128
+        self.max_amount_allowed = ((self.stake_amount + self.profit_amount) as f64 * self.amount_allowed_rate as f64) as u128   //re-calculate max amount for bets
     }
 }
 

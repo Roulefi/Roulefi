@@ -48,40 +48,49 @@ pub struct Contract {
         modulus: 0 for even, 1 for odd
         number: number
     */
-    // See more data types at https://doc.rust-lang.org/book/ch03-02-data-types.html
-    pub max_amount_allowed: u128,
-    pub amount_allowed_rate: f32,
-    pub number_range: [u8; 6],
-    pub payouts: [u8; 6],
-    pub min_lock_time: u32,
-    pub step_time: Vec<u32>,
-    pub step_rate: Vec<f32>,
-    pub treasury_rate: f32,
-    pub round_block_index: BlockHeight,
-    pub round_delta: BlockHeight,
-    pub round_index: BlockHeight,
+    pub creator: AccountId,
+    pub max_amount_allowed: u128,   // max bet amount per round
+    pub amount_allowed_rate: f32,   // max_amount_allowed = (stake_amount + profit_amount) * amount_allowed_rate
+    pub number_range: [u8; 6],      // the number range for every type of bet
+    pub payouts: [u8; 6],           // 6 types of payout
+    pub treasury_threshold: u128,   // treasury amount threshold
+    pub treasury_shares: [f32; 3],   // treasury shares
+    pub last_treasury_time: u64,
+    pub min_lock_time: u32,         // min time for staking pool to withdraw
+    pub step_time: Vec<u32>,        // a user's share in the pool will rise after each step_time
+    pub step_rate: Vec<f32>,        // the share multiplier for each step_time
+    pub treasury_rate: f32,         // the percentage for every round profit in the pool
+    pub round_block_index: BlockHeight,  // timestamp when in a new round
+    pub round_delta: BlockHeight,   // time period between rounds
+    pub round_index: BlockHeight,   // total round index
 
-    pub bet_users: Vec<AccountId>,
-    pub stake_users: Vec<AccountId>,
-    pub win_number: u8,
-    pub users: HashMap<AccountId, User>,
-    pub bet_amount: u128,
-    pub stake_amount: u128,
-    pub treasury_amount: u128,
-    pub profit_amount: u128,
+    pub bet_users: Vec<AccountId>,  // users who have bets
+    pub stake_users: Vec<AccountId>, // users who have stakes
+    pub win_number: u8,             // win number for the last round
+    pub users: HashMap<AccountId, User>, // users data
+    pub bet_amount: u128,           // total bet amount in the given round
+    pub stake_amount: u128,         // total stake amount
+    pub treasury_amount: u128,      // total treasury amount
+    pub profit_amount: u128,        // total profit amount
 }
 
+/*
+To show the basic user info and contract info
+*/
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug)]
 pub struct Status {
-    pub balance: U128,
-    pub bet_amount: U128,
-    pub max_bet_amount: U128,
-    pub stake_amount: U128,
-    pub user: User
+    pub balance: U128,              // contract balance
+    pub bet_amount: U128,           // total bet amount in this round
+    pub max_bet_amount: U128,       // the limit for bet_amount
+    pub stake_amount: U128,         // total stake amount
+    pub user: User                  // user data
 }
 
+/*
+round info for spinning
+*/
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug)]
@@ -89,7 +98,7 @@ pub struct RoundStatus {
     pub current_block_index: BlockHeight,
     pub round_index: BlockHeight,
     pub next_round_block_index: BlockHeight,
-    pub bet_count: u32,
+    pub bet_count: u32,                          // total bet counts
     pub win_number: u8,
 }
 
@@ -97,10 +106,10 @@ pub struct RoundStatus {
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug, Clone)]
 pub struct User {
-    pub bets: Vec<Bet>,
-    pub balance: U128,
+    pub bets: Vec<Bet>,               // all bets
+    pub balance: U128,                // user deposit in the contract
     pub history_bets: Vec<HistoryBet>,
-    pub stakes: Vec<Stake>,
+    pub stakes: Vec<Stake>,           // all stakes
 }
 
 
@@ -111,19 +120,22 @@ impl Contract {
     pub fn new() -> Self {
         assert!(env::state_read::<Self>().is_none(), "Already initialized");
         Self {
+            creator: "bhc.testnet".to_string(),
             payouts: [2,3,3,2,2,36],
             number_range: [1,2,2,1,1,36],
             amount_allowed_rate: 0.1,
-            max_amount_allowed: (env::account_balance() as f64 * 0.1) as u128, /* 2 ether */
-            min_lock_time: 259200,
-            step_time: vec![0, 604800, 2592000],
-            step_rate: vec![0.0, 0.05, 0.2],
+            max_amount_allowed: (env::account_balance() as f64 * 0.1) as u128, 
+            min_lock_time: 0,                       // now it is not working
+            step_time: vec![0, 604800, 2592000],    // one week , one month
+            step_rate: vec![0.0, 0.05, 0.2],        // 5%, 20%
             treasury_rate: 0.1,
+            treasury_threshold: 10000000000000000000000000000,  // 10k
+            treasury_shares: [0.4, 0.4, 0.2],    // gamers, stake users, team
+            last_treasury_time: 0,
 
             bet_users: Vec::new(),
             stake_users: Vec::new(),
             win_number: 0,
-            // bet_amount: 10000000000000000000000, /* 0.01 ether */
             
             users: HashMap::new(),
             bet_amount: 0,

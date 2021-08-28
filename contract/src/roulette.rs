@@ -21,7 +21,9 @@ use std::num;
 use crate::*;
 
 
-
+/*
+check if the bet wins
+*/
 pub fn check_win(number:u8, b: &Bet) -> bool {
     let mut won = false;
     if number == 0 {
@@ -67,9 +69,9 @@ pub fn check_win(number:u8, b: &Bet) -> bool {
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug, Clone)]
 pub struct Bet {
-    pub bet_type: u8,
+    pub bet_type: u8,  
     pub number: u8,
-    pub chips: U128,
+    pub chips: U128,  // 1 chip = 0.01 NEAR
 }
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
@@ -81,6 +83,7 @@ pub struct HistoryBet {
     pub chips: U128,
     pub win_chips: U128,
     pub win_number: u8,
+    pub time: U64
 }
 
 
@@ -99,53 +102,53 @@ impl Contract {
             assert!(item.bet_type <= 5);
             assert!(item.number <= self.number_range[item.bet_type as usize]); 
         }
-        let balance = u128::from(user.balance) + env::attached_deposit();
+        let balance = u128::from(user.balance) + env::attached_deposit();   // check if user's deposit amount and current trasaction's deposit are greater than the bets
         assert!(balance >= total, "not enough balance");
         let bet_amount = self.bet_amount + total;
-        assert!(bet_amount < self.max_amount_allowed, "exceed max bet amount allowed");
+        assert!(bet_amount < self.max_amount_allowed, "exceed max bet amount allowed");  // check if total bet amount is greater than the max amount allowed
 
         self.bet_amount = bet_amount;
-        user.balance = U128::from(balance - total);
+        user.balance = U128::from(balance - total);  // the balance decrease when bet is confirmed
         if user.bets.len() == 0 {
             self.bet_users.push(sender);
         }
-        user.bets = [user.bets.clone(), bets.clone()].concat();
+        user.bets = [user.bets.clone(), bets.clone()].concat();  
     }
 
 
-    
+    /*
+    this method is controlled by a script. the script keeps getting round status until there is any bet
+    and time to next_round_block_index, then call this method
+    */
     pub fn spin_wheel(&mut self) {
-        /* are we allowed to spin the wheel? */
         assert!(env::block_index() > self.round_block_index + self.round_delta, "too quick to spin");
-        let sender = env::predecessor_account_id();
-        let creator = env::current_account_id();
+        // let sender = env::predecessor_account_id();
+        // let creator = env::current_account_id();
         // assert!(sender == creator, "not contract owner");
         assert!(self.bet_users.len() > 0, "no bets");
 
-        /* are there any bets? */
-        /* next time we are allowed to spin the wheel again */
-        
-        /* calculate 'random' number */
-        let hash = env::sha256(&env::random_seed());
+        let player = self.bet_users.get(self.bet_users.len() - 1).unwrap();
+        let bets = self.users.get(player).unwrap().clone().bets;
+        let bet = bets.get(bets.len() - 1).unwrap();
+        let nonce: Vec<u8> = vec![bet.number, bet.bet_type];
+        let hash = env::sha256(&[env::random_seed(), nonce, player[..].as_bytes().to_vec()].concat());  //make hash with nonce
         let mut hash_bytes: [u8;4] = [0;4];
         for i in 0..4 {
             hash_bytes[i] = hash.get(i).unwrap().clone();
         }
-        let hash_number = u32::from_be_bytes(hash_bytes);
+        let hash_number = u32::from_be_bytes(hash_bytes);   // generate random number
         let number: u8 = hash_number as u8 % 37 ;
-        /* check every bet for this number */
         
         let mut total_bet:u128 = 0;
         let mut total_win:u128 = 0;
 
-        for player_str in self.bet_users.iter() {
+        for player_str in self.bet_users.iter() {                 // check every bet if it wins
             let mut user = self.users.get_mut(player_str).unwrap();
             let mut bet_amount = 0;
             let mut win_amount = 0;
             for b in user.bets.iter() {
                 let won = check_win(number, b);
                 bet_amount += u128::from(b.chips);
-                /* if winning bet, add to player balance balance */
                 if won {
                     let win_chips = self.payouts[b.bet_type as usize] as u128 * u128::from(b.chips);
                     win_amount += win_chips;
@@ -155,6 +158,7 @@ impl Contract {
                         chips: b.chips,
                         win_chips: U128::from(win_chips),
                         win_number: number,
+                        time: U64::from(env::block_timestamp())
                     });
                 } else {
                     user.history_bets.push(HistoryBet{
@@ -163,6 +167,7 @@ impl Contract {
                         chips: b.chips,
                         win_chips: U128::from(0),
                         win_number: number,
+                        time: U64::from(env::block_timestamp())
                     });
                 }
             }
@@ -181,8 +186,11 @@ impl Contract {
         self.win_number = number;
     }
 
+    /*
+    deposit near to play
+    */
     #[payable]
-    pub fn deposit(&mut self, amount: U128) {
+    pub fn deposit(&mut self, amount: U128) {                   
         let sender = env::predecessor_account_id();
         let user = self.users.entry(sender.to_string()).or_insert(new_user());
         let amount = u128::from(amount);
@@ -191,7 +199,10 @@ impl Contract {
         user.balance = U128::from(u128::from(user.balance) + amount);
     }
 
-    pub fn withdraw(&mut self, amount: U128) {
+    /*
+    withdraw from balance
+    */
+    pub fn withdraw(&mut self, amount: U128) {                  
         let sender = env::predecessor_account_id();
         let user = self.users.get_mut(&sender).unwrap();
         let amount = u128::from(amount);
