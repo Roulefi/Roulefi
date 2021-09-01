@@ -77,13 +77,22 @@ pub struct Bet {
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug, Clone)]
-pub struct HistoryBet {
-    pub bet_type: u8,
-    pub number: u8,
-    pub chips: U128,
+pub struct HistoryRoundBets {
+    pub bets: Vec<Bet>,
     pub win_chips: U128,
     pub win_number: u8,
-    pub time: U64
+    pub time: U64,
+    pub round_index: BlockHeight
+}
+
+#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+#[derive(Debug, Clone)]
+pub struct HistoryNumber {
+    pub win_number: u8,
+    pub round_index: BlockHeight,
+    pub round_block_index: BlockHeight,
+    pub time: U64,
 }
 
 
@@ -93,9 +102,11 @@ impl Contract {
 
     #[payable]
     pub fn bet(&mut self, bets: Vec<Bet>) {
+        let prev_storage = env::storage_usage();
         let sender = env::predecessor_account_id();
         let user = self.users.entry(sender.to_string()).or_insert(new_user());
         assert!(bets.len() > 0, "you have 0 bets");
+        assert!(user.bets.len() == 0, "you've already bet");
         let mut total:u128= 0;
         for item in bets.iter() {
             total += u128::from(item.chips);
@@ -112,7 +123,7 @@ impl Contract {
         if user.bets.len() == 0 {
             self.bet_users.push(sender);
         }
-        user.bets = [user.bets.clone(), bets.clone()].concat();  
+        user.bets = bets.clone();  
     }
 
 
@@ -141,7 +152,6 @@ impl Contract {
         
         let mut total_bet:u128 = 0;
         let mut total_win:u128 = 0;
-
         for player_str in self.bet_users.iter() {                 // check every bet if it wins
             let mut user = self.users.get_mut(player_str).unwrap();
             let mut bet_amount = 0;
@@ -149,38 +159,37 @@ impl Contract {
             for b in user.bets.iter() {
                 let won = check_win(number, b);
                 bet_amount += u128::from(b.chips);
+                let mut win_chips = 0;
                 if won {
-                    let win_chips = self.payouts[b.bet_type as usize] as u128 * u128::from(b.chips);
-                    win_amount += win_chips;
-                    user.history_bets.push(HistoryBet{
-                        bet_type: b.bet_type,
-                        number: b.number,
-                        chips: b.chips,
-                        win_chips: U128::from(win_chips),
-                        win_number: number,
-                        time: U64::from(env::block_timestamp())
-                    });
-                } else {
-                    user.history_bets.push(HistoryBet{
-                        bet_type: b.bet_type,
-                        number: b.number,
-                        chips: b.chips,
-                        win_chips: U128::from(0),
-                        win_number: number,
-                        time: U64::from(env::block_timestamp())
-                    });
-                }
+                    win_chips = self.payouts[b.bet_type as usize] as u128 * u128::from(b.chips);
+                    win_amount += win_chips.clone();
+                    
+                }      
             }
             user.balance = U128::from(u128::from(user.balance) + win_amount);
-            user.bets.clear();
             total_bet += bet_amount;
             total_win += win_amount;
+            user.history_bets.push(HistoryRoundBets{
+                bets: user.bets.clone(),
+                win_chips: U128::from(win_amount.clone()),
+                win_number: number,
+                time: U64::from(env::block_timestamp()),
+                round_index: self.round_index
+            }); 
+            user.bets.clear();
         }
-
         self.cal_profit(total_bet, total_win);
+        self.deal_history();
         
         self.bet_users.clear();
         self.bet_amount = 0;
+        self.history_numbers.push(HistoryNumber {
+            win_number: number,
+            round_index: self.round_index,
+            round_block_index: self.round_block_index,
+            time: U64::from(env::block_timestamp()),
+        });
+        
         self.round_block_index = env::block_index();
         self.round_index += 1;
         self.win_number = number;

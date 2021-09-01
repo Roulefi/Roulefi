@@ -332,21 +332,54 @@
           </div>
         </div>
       </div>
-      <div class="line" style="padding-bottom: 100px">
+      <div class="line">
         <div class="wallet-wrapper">
           <div class="wallet-unit" @click.stop>
             <div class="input-wrapper" v-if="deposit_visible">
               <input v-model="deposit_text"/>
             </div>
-            <button @click="toggle_deposit()">DEPOSIT</button>
+            <button @click="toggle_deposit()">{{deposit_visible ? 'CONFIRM':'DEPOSIT'}}</button>
           </div>
           <div class="wallet-unit" @click.stop>
             <div class="input-wrapper" v-if="withdraw_visible">
               <input v-model="withdraw_text"/>
             </div>
-            <button @click="toggle_withdraw()">WITHDRAW</button>
+            <button @click="toggle_withdraw()">{{withdraw_visible ? 'CONFIRM':'WITHDRAW'}}</button>
           </div>
           <div>1 chip = 0.01 NEAR</div>
+        </div>
+      </div>
+      <div class="line" style="margin-top: 30px;">
+        <div style="width: 100%;display: flex; justify-content:center">
+          <button @click="toggle_history()">{{history_visible ? 'HIDE HISTORY':'SHOW HISTORY'}}</button>
+        </div>
+      </div>
+      <div class="line" v-if="history_visible" style="padding-bottom: 100px;">
+        <div class="left">
+          <div class="history-wrapper" v-for="(number, i) in history_numbers" :key="i">
+            <div class="history" style="margin-right: 30px">
+              ROUND: {{number.round_index}}
+            </div>
+            <div class="history" style="margin-right: 30px">
+              NUMBER: {{number.win_number}}
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="history-wrapper" v-for="(number, i) in history_bets" :key="i">
+            <div class="history" style="margin-right: 30px">
+              ROUND: {{number.round_index}}
+            </div>
+            <div class="history" style="margin-right: 30px">
+              NUMBER: {{number.win_number}}
+            </div>
+            <div class="history" style="margin-right: 30px">
+              BET: {{number.bet_chips}}
+            </div>
+            <div class="history" style="margin-right: 30px">
+              WON: {{Math.floor(Number(contract.from_yocto(number.win_chips)) * 100)}}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -480,7 +513,10 @@ export default {
       next_round_block_index: 0,
       current_block_index: 0,
       waiting: false,
-      bet_disabled: false
+      bet_disabled: false,
+      history_visible: false,
+      history_numbers: [],
+      history_bets: [],
     }
   },
 
@@ -574,6 +610,8 @@ export default {
       this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
       this.remain_time = this.remain_time < 0 ? 0:this.remain_time
       this.animation(this.win_number, true)
+      this.history_numbers = round_status.history_numbers
+      console.log(round_status)
 
       this.interval = setInterval(async () => {
         if (this.waiting) {
@@ -586,6 +624,7 @@ export default {
           this.round_index = round_status.round_index
           this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
           this.remain_time = this.remain_time < 0 ? 0:this.remain_time
+          this.history_numbers = round_status.history_numbers
           this.spin_wheel()
         }
         this.waiting = false
@@ -622,6 +661,14 @@ export default {
         balance_str = balance_str.replace(/,/g, "");
         this.editBalance(balance_str)
         this.win_number = status.win_number
+        this.history_bets = status.user.history_bets
+        for (let i = 0; i < this.history_bets.length; i ++) {
+          let round = this.history_bets[i]
+          round.bet_chips = 0
+          for (let j = 0; j < round.bets.length; j ++) {
+            round.bet_chips += Number(this.contract.from_yocto(round.bets[j].chips)) * 100
+          }
+        }
       }
     },
 
@@ -911,6 +958,10 @@ export default {
       } else {
         this.withdraw(Number(this.withdraw_text))
       }
+    },
+
+    toggle_history() {
+      this.history_visible = !this.history_visible
     },
 
     clear_button() {
@@ -1240,8 +1291,9 @@ button:hover {
 
 .wallet-wrapper {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
+  width: 100%;
   margin-top: 90px;
 }
 
@@ -1317,6 +1369,23 @@ button:hover {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.history-wrapper {
+  width: 100%;
+  border-radius: 20px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  border: 1px solid #fff;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.history {
+  color: #fff;
+  font-weight: 500;
+  font-size: 24px;
 }
 
 

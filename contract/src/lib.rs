@@ -72,6 +72,8 @@ pub struct Contract {
     pub stake_amount: u128,         // total stake amount
     pub treasury_amount: u128,      // total treasury amount
     pub profit_amount: u128,        // total profit amount
+    pub history_numbers: Vec<HistoryNumber>, //history number
+    pub history_limit_count: u32,
 }
 
 /*
@@ -100,6 +102,7 @@ pub struct RoundStatus {
     pub next_round_block_index: BlockHeight,
     pub bet_count: u32,                          // total bet counts
     pub win_number: u8,
+    pub history_numbers: Vec<HistoryNumber>
 }
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
@@ -108,7 +111,7 @@ pub struct RoundStatus {
 pub struct User {
     pub bets: Vec<Bet>,               // all bets
     pub balance: U128,                // user deposit in the contract
-    pub history_bets: Vec<HistoryBet>,
+    pub history_bets: Vec<HistoryRoundBets>,
     pub stakes: Vec<Stake>,           // all stakes
 }
 
@@ -132,6 +135,7 @@ impl Contract {
             treasury_threshold: 10000000000000000000000000000,  // 10k
             treasury_shares: [0.4, 0.4, 0.2],    // gamers, stake users, team
             last_treasury_time: 0,
+            history_limit_count: 20,
 
             bet_users: Vec::new(),
             stake_users: Vec::new(),
@@ -145,6 +149,7 @@ impl Contract {
             round_block_index: 0,
             round_delta: 60,
             round_index: 0,
+            history_numbers: Vec::new()
         }
     }
 
@@ -187,9 +192,30 @@ impl Contract {
             next_round_block_index: (self.round_block_index + self.round_delta) as BlockHeight,
             bet_count: self.bet_users.len() as u32,
             win_number: self.win_number,
+            history_numbers: self.history_numbers.clone(),
         }
     }
 
+}
+
+impl Contract { 
+    pub(crate) fn deal_history(&mut self) {
+        if self.history_numbers.len() > self.history_limit_count as usize {
+            let delta = self.history_numbers.len() - self.history_limit_count as usize;
+            for i in 0..delta {
+                self.history_numbers.remove(i);
+            }
+        }
+        for player_str in self.bet_users.iter() {
+            let mut user = self.users.get_mut(player_str).unwrap();
+            if user.history_bets.len() > self.history_limit_count as usize {
+                let delta = self.history_numbers.len() - self.history_limit_count as usize;
+                for i in 0..delta {
+                    self.history_numbers.remove(i);
+                }
+            }
+        }
+    }
 }
 
 // use the attribute below for unit tests

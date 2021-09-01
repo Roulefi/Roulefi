@@ -12,9 +12,8 @@
       </div>
     </div>
     <div class="index-wrapper">
-      <div class="line" style="justify-content: unset">
+      <div class="line" style="justify-content: center">
         <div class="balance" style="margin-right: 30px;">YOUR STAKE<p><span>{{my_stake_amount}}</span></p></div>
-        <div class="balance" style="margin-right: 30px;">TOTAL BET<p><span>{{bet_amount}}</span></p></div>
         <div class="bet">TOTAL STAKE<p><span>{{stake_amount}}</span></p></div>
       </div>
       <div class="line" style="justify-content: center" v-for="(item, i) in stakes" :key="i">
@@ -275,135 +274,6 @@ export default {
   align-items: center;
 }
 
-.wheel {
-  position: relative;
-  width: 330px;
-  height: 330px;
-  max-width: 330px;
-  max-height: 330px;
-}
-
-.place-bet {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-content: center;
-  justify-content: center;
-}
-
-.wheel-base {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-content: center;
-  justify-content: center;
-}
-
-.wheel text {
-    text-anchor: middle;
-    font-size: 19px;
-    fill: hsla(0,0%,100%,.9);
-    font-weight: 500;
-}
-
-.board-wrap {
-    border: 0px solid #fff !important;
-    font-size: 20px;
-}
-
-.board-wrap>div {
-    cursor: pointer!important;
-}
-
-.board {
-  width: 97vw;
-  max-width: 750px;
-  height: 34.64286vw;
-  max-height: 267.85714px;
-  display: grid;
-  grid-area: board1;
-  grid-template-columns: repeat(14,1fr);
-  grid-template-areas:
-      "n50 n53 n56 n59 n512 n515 n518 n521 n524 n527 n530 n533 n536 n12"
-      "n50 n52 n55 n58 n511 n514 n517 n520 n523 n526 n529 n532 n535 n11"
-      "n50 n51 n54 n57 n510 n513 n516 n519 n522 n525 n528 n531 n534 n10"
-      ". n20 n20 n20 n20 n21 n21 n21 n21 n22 n22 n22 n22 ."
-      ". n30 n30 n40 n40 n01 n01 n00 n00 n41 n41 n31 n31 .";
-  color: white;
-}
-
-.board>div {
-    display: grid;
-    position: relative;
-    place-items: center;
-    text-transform: uppercase;
-    border-top: 1px solid #fff;
-    border-right: 1px solid #fff;
-    z-index: 100;
-}
-
-.board>#n50, .board>#n30, .board>#n20 {
-    border-left: 1px solid #fff;
-}
-.board>#n00, .board>#n40, .board>#n31, .board>#n50, .board>#n41, .board>#n01, .board>#n30, .board>#n10 {
-    border-bottom: 1px solid #fff;
-}
-
-#n51, #n54, #n57, #n510, #n513, #n516, #n519, #n522, #n525, #n528, #n531, #n534 {
-    box-shadow: 0 4px 0 rgb(0 0 0 / 20%);
-}
-
-.board .red {
-    background-color: #ec0230;
-}
-
-.board .black {
-    background-color: #2b2627;
-}
-
-.board #n01 polygon {
-    fill: #ec0230;
-    stroke: #fff;
-}
-
-.bet-select {
-    grid-area: chips;
-    margin: 9px;
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(10,minmax(auto,68px));
-    grid-column-gap: 4px;
-    -webkit-justify-content: center;
-    justify-content: center;
-    place-items: center;
-}
-
-.bet-option.active {
-    -webkit-transform: translateY(-10px);
-    transform: translateY(-10px);
-}
-
-.bet-option {
-    transition: all .3s;
-}
-
-.bet-option, .chip {
-    width: 100%;
-}
-
-.bet-select .chip {
-    cursor: pointer;
-}
-
-.bet-option, .chip {
-    width: 100%;
-}
 
 .info {
   display: flex;
@@ -601,7 +471,7 @@ button:hover {
   padding: 5px;
   display: flex;
   justify-content: center;
-  border: 1px solid #000;
+  border: 1px solid #fff;
   margin-top: 20px;
   align-items: center;
 }
