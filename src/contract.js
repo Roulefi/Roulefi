@@ -3,7 +3,7 @@ import * as nearAPI from "near-api-js";
 import getConfig from "./config";
 const nearConfig = getConfig("development");
 const BET_AMOUNT =  "0000000000000000000000"; /* 0,01 ether, around $6 */
-const GAS = "300000000000000";
+const GAS = "3000000000000"; //300000000000000
 
 export default class Contract {
 
@@ -36,6 +36,10 @@ export default class Contract {
         sender: this.wallet_connection.getAccountId()
     });
     this.provider = await new nearAPI.providers.JsonRpcProvider(nearConfig.nodeUrl);
+  }
+
+  async is_signed_in() {
+    return this.wallet_connection.isSignedIn()
   }
 
   async sign_in() {
@@ -100,12 +104,13 @@ export default class Contract {
 
       bets_format.push(bet)
     }
+    amount += 0.01
     let balance = Number(this.from_yocto(this.status.user.balance))
     if (balance < amount) {
       let pay = String(parseInt((amount - balance) * 100)) + BET_AMOUNT
       await this.contract.bet({bets: bets_format}, GAS, pay)
     } else {
-      await this.contract.bet({bets: bets_format})
+      await this.contract.bet({bets: bets_format}, GAS)
     }
   }
 

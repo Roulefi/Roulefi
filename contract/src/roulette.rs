@@ -102,7 +102,8 @@ impl Contract {
 
     #[payable]
     pub fn bet(&mut self, bets: Vec<Bet>) {
-        let prev_storage = env::storage_usage();
+        assert!(!self.spinning, "wheel spinning, try later");
+        //let prev_storage = env::storage_usage();
         let sender = env::predecessor_account_id();
         let user = self.users.entry(sender.to_string()).or_insert(new_user());
         assert!(bets.len() > 0, "you have 0 bets");
@@ -114,7 +115,7 @@ impl Contract {
             assert!(item.number <= self.number_range[item.bet_type as usize]); 
         }
         let balance = u128::from(user.balance) + env::attached_deposit();   // check if user's deposit amount and current trasaction's deposit are greater than the bets
-        assert!(balance >= total, "not enough balance");
+        assert!(balance >= total + 10000000000000000000000, "not enough balance");  // 0.01 Near for spinning gas fee
         let bet_amount = self.bet_amount + total;
         assert!(bet_amount < self.max_amount_allowed, "exceed max bet amount allowed");  // check if total bet amount is greater than the max amount allowed
 
@@ -137,6 +138,7 @@ impl Contract {
         // let creator = env::current_account_id();
         // assert!(sender == creator, "not contract owner");
         assert!(self.bet_users.len() > 0, "no bets");
+        self.spinning = true;
 
         let player = self.bet_users.get(self.bet_users.len() - 1).unwrap();
         let bets = self.users.get(player).unwrap().clone().bets;
@@ -178,21 +180,24 @@ impl Contract {
             }); 
             user.bets.clear();
         }
-        self.cal_profit(total_bet, total_win);
-        self.deal_history();
         
-        self.bet_users.clear();
-        self.bet_amount = 0;
         self.history_numbers.push(HistoryNumber {
             win_number: number,
             round_index: self.round_index,
             round_block_index: self.round_block_index,
             time: U64::from(env::block_timestamp()),
         });
+        self.cal_profit(total_bet, total_win);
+        self.deal_history();
+        
+        self.bet_users.clear();
+        self.bet_amount = 0;
+        
         
         self.round_block_index = env::block_index();
         self.round_index += 1;
         self.win_number = number;
+        self.spinning = false;
     }
 
     /*

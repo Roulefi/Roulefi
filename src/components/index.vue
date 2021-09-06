@@ -15,7 +15,7 @@
       <div class="line">
         <div class="left">
           <div class="wheel">
-            <div class="place-bet">
+            <div class="place-bet" ref="board">
               <svg viewBox="0 0 380 380"  class="spin-ani">
                 <g>
                   <circle stroke-width="10" stroke="black" stroke-opacity="0.2" fill="transparent" cx="190" cy="190" r="182">
@@ -322,14 +322,14 @@
           </div>
         </div>
         <div class="right">
-          <div class="actions">
+          <fieldset class="actions" ref="actions">
             <button aria-label="Clear Board" @click="rebet()">Rebet</button>
             <button aria-label="Clear Board" @click="clear()">Clear</button>
-            <button aria-label="Undo" @click="undo()"><svg width="20" height="20"><g><path d="M9.926 2.622v16.002l-8-8.001z"></path><path d="M9 7.393v5.93c5.684.053 10.645 3.119 13.363 7.678l.002-.094c0-7.415-5.97-13.432-13.365-13.514z"></path></g></svg></button>
-            <button aria-label="Clear Board" @click="bet_submit()" :disabled="bet_disabled">BET</button>
+            <button aria-label="Undo" @click="undo()">undo</button>
+            <button aria-label="Clear Board" @click="bet_submit()">BET</button>
             <!-- <button aria-label="Spin the Wheel" class="spin" @click="spin_wheel()"><svg viewBox="0 0 100 100" :class="{'ball-ani': spinning}"><circle class="hover" fill="rgba(0,0,0,0.1)" cx="50" cy="50" r="50" stroke-width="0"></circle><g transform="translate(5,5)"><path d="M87.954 47.938c-2.888 10.131-8.871 18.949-16.871 25.374a50.175 50.175 0 01-13.916 7.917h11.445c10.596-6.92 17.972-18.354 19.386-31.579-.009-.572-.015-1.145-.044-1.712zM21.388 8.771C10.792 15.692 3.417 27.126 2.002 40.35c.009.572.017 1.145.046 1.713 2.885-10.131 8.871-18.95 16.868-25.376a50.307 50.307 0 0113.917-7.916H21.388z"></path></g><circle fill="none" cx="50" cy="50" r="43.25" stroke-width="1"></circle><text x="50%" y="50%" text-anchor="middle" dy=".33em">Spin</text></svg>
             </button> -->
-          </div>
+          </fieldset>
         </div>
       </div>
       <div class="line">
@@ -503,6 +503,7 @@ export default {
       deposit_visible: false,
       withdraw_visible: false,
       spinning: false,
+      already_bet: false,
       win_number: 0,
       wheelSpinCounter: 0,
       lastPosition: 0,
@@ -561,10 +562,11 @@ export default {
 
     async initLogin() {
       let login = localStorage.getItem("login")
-      let accountId = await this.contract.get_account()
+      let accountId = await this.contract.is_signed_in()
       this.login = login || accountId
       if (this.login) {
         localStorage.setItem("login", true)
+
       } else {
         localStorage.removeItem("login")
       }
@@ -614,7 +616,7 @@ export default {
       console.log(round_status)
 
       this.interval = setInterval(async () => {
-        if (this.waiting) {
+        if (this.waiting || this.spinning) {
           return
         }
         this.waiting = true
@@ -625,6 +627,8 @@ export default {
           this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
           this.remain_time = this.remain_time < 0 ? 0:this.remain_time
           this.history_numbers = round_status.history_numbers
+          this.$refs.actions.disabled = false
+          this.$refs.board.disabled = false
           this.spin_wheel()
         }
         this.waiting = false
@@ -680,10 +684,11 @@ export default {
       this.contract.sign_out()
       this.editBalance(0)
       this.login = false
+      localStorage.removeItem("login")
     },
 
     editBalance(balance) {
-      this.balance = Number(balance)
+      this.balance = Math.floor(Number(balance))
       let i = 0
       let original_balance = this.balance_amount
       let now_balance = this.balance
@@ -755,7 +760,7 @@ export default {
     },
 
     bet(number, bet_type, node, chips=this.amount_select) {
-      if (this.spinning) {
+      if (this.already_bet) {
         return
       }
       let bet = {
@@ -777,29 +782,42 @@ export default {
     },
 
     async bet_submit() {
-      if (this.spinning) {
+      if (!this.login) {
+        this.sign_in()
         return
       }
-      this.bet_disabled = true
+      if (this.already_bet) {
+        return
+      }
+      this.already_bet = true
+      this.$refs.actions.disabled = true
+      this.$refs.board.disabled = true
       try {
         await this.contract.bet(this.bets)
         window.alert("Bet Success");
       } catch {
+        this.$refs.actions.disabled = false
+        this.$refs.board.disabled = false
+        this.already_bet = false
         window.alert("Transaction Expired");
       }
-      this.bet_disabled = false
       this.update()
     },
 
     rebet() {
+      if (!this.login) {
+        this.sign_in()
+        return
+      }
       for (let i = 0; i < this.last_bets.length; i++) {
         let bet = this.last_bets[i]
         this.bet(bet.number, bet.bet_type, bet.node, bet.chips)
       }
+      this.bet_submit()
     },
 
     undo() {
-      if (this.spinning) {
+      if (this.already_bet) {
         return
       }
       if (this.bets.length <= 0) {
@@ -818,7 +836,7 @@ export default {
     },
 
     clear() {
-      if (this.spinning) {
+      if (this.already_bet) {
         return
       }
       for (let i = 0; i < this.bets.length; i++) {
@@ -916,6 +934,7 @@ export default {
         this.clear_ui()
         this.update()
         this.spinning = false
+        this.already_bet = false
       }, 8000)
       this.animation(this.win_number)
       
@@ -1388,7 +1407,40 @@ button:hover {
   font-size: 24px;
 }
 
+[disabled] button, button[disabled] {
+  box-shadow: none;
+  background-color: var(--light-gray);
+  color: gray;
+  cursor: not-allowed;
+  transform: none;
+}
 
+[disabled] .loader-content {
+  text-indent: -900em;
+  width: 2em;
+  position: relative;
+}
+[disabled] .loader-content:after {
+  content: " ";
+  display: block;
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  border-color: var(--fg) transparent var(--fg) transparent;
+  animation: loader 1.2s linear infinite;
+  position: absolute;
+  top: 0.45em;
+  right: 0.5em;
+}
 
+@keyframes loader {
+  0% { transform: rotate(0deg) }
+  100% { transform: rotate(360deg) }
+}
+
+fieldset {
+  border: none;
+}
 
 </style>

@@ -5,7 +5,7 @@ use std::fmt::Debug;
 
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::serde::{Serialize, Deserialize};
-use near_sdk::{BlockHeight, PanicOnDefault, Promise, env, near_bindgen};
+use near_sdk::{BlockHeight, Gas, PanicOnDefault, Promise, env, near_bindgen};
 use near_sdk::{AccountId};
 use near_sdk::json_types::{U128, U64};
 
@@ -74,6 +74,8 @@ pub struct Contract {
     pub profit_amount: u128,        // total profit amount
     pub history_numbers: Vec<HistoryNumber>, //history number
     pub history_limit_count: u32,
+    pub gas_per_player: u128,
+    pub spinning: bool,
 }
 
 /*
@@ -149,7 +151,9 @@ impl Contract {
             round_block_index: 0,
             round_delta: 60,
             round_index: 0,
-            history_numbers: Vec::new()
+            history_numbers: Vec::new(),
+            gas_per_player: 10000000000000000000000,
+            spinning: false,
         }
     }
 

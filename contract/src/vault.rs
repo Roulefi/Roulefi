@@ -151,6 +151,13 @@ impl Contract {
     profit needs to calculate every round
     */
     pub(crate) fn cal_profit(&mut self, total_bet: u128, total_win:u128) {
+        let new_user = &mut new_user();
+        let gas_per_player = (env::prepaid_gas() as f64 / self.bet_users.len() as f64) as u128;
+        for key in self.bet_users.iter() {
+            let user: &mut User = self.users.get_mut(key).unwrap_or(new_user);
+            user.balance = U128::from(u128::from(user.balance) - gas_per_player);
+        }
+
         if u128::from(self.profit_amount) + total_bet > total_win {
             self.profit_amount = self.profit_amount + total_bet - total_win;  // deal with total profit
         } else {
@@ -171,7 +178,6 @@ impl Contract {
         }
 
         let now = env::block_timestamp();
-        let new_user = &mut new_user();
         for key in self.stake_users.iter() {                                           // deal with each stake
             let user: &mut User = self.users.get_mut(key).unwrap_or(new_user);
             for stake in user.stakes.iter_mut() {
