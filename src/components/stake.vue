@@ -19,10 +19,10 @@
       <div class="line" style="justify-content: center" v-for="(item, i) in stakes" :key="i">
         <div class="stake-wrapper">
           <div class="stake" style="margin-right: 30px">
-            AMOUNT: {{Number(contract.from_yocto(item.amount)).toFixed(2)}}
+            AMOUNT: {{Number(contract.from_yocto(item.amount).replace(/,/g, "")).toFixed(2)}}
           </div>
           <div class="stake" style="margin-right: 30px">
-            PROFIT: {{Number(contract.from_yocto(item.profit)).toFixed(2)}}
+            PROFIT: {{Number(contract.from_yocto(item.profit).replace(/,/g, "")).toFixed(2)}}
           </div>
           <div class="wallet-unit" @click.stop>
             <div class="input-wrapper" v-if="unstake_visible[i]">
@@ -122,15 +122,16 @@ export default {
         let status = await this.contract.get_status()
         this.status = status
         console.log(status)
-        this.bet_amount = this.contract.from_yocto(status.bet_amount)
-        this.stake_amount = this.contract.from_yocto(status.stake_amount)
+        this.bet_amount = this.contract.from_yocto(status.bet_amount).replace(/,/g, "")
+        this.stake_amount = this.contract.from_yocto(status.stake_amount).replace(/,/g, "")
         this.stakes = this.status.user.stakes
         let total = 0
         this.unstake_visible = []
         for (let i = 0; i < this.stakes.length; i ++) {
           let stake = this.stakes[i]
-          total += Number(this.contract.from_yocto(stake.amount))
+          total += Number(this.contract.from_yocto(stake.amount).replace(/,/g, ""))
           this.unstake_visible.push(false)
+          console.log(total)
         }
         this.my_stake_amount = total
       }
