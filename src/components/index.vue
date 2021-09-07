@@ -482,6 +482,14 @@ function check_win(number, b) {
     return won
 }
 
+// function reverse(arr) {
+//   let new_arr = []
+//   for (let i = arr.length - 1; i >= 0; i --) {
+//     new_arr.push(arr[i])
+//   }
+//   return new_arr
+// }
+
 export default {
   
   data() {
@@ -612,7 +620,7 @@ export default {
       this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
       this.remain_time = this.remain_time < 0 ? 0:this.remain_time
       this.animation(this.win_number, true)
-      this.history_numbers = round_status.history_numbers
+      this.history_numbers = round_status.history_numbers.reverse()
       console.log(round_status)
 
       this.interval = setInterval(async () => {
@@ -626,7 +634,8 @@ export default {
           this.round_index = round_status.round_index
           this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
           this.remain_time = this.remain_time < 0 ? 0:this.remain_time
-          this.history_numbers = round_status.history_numbers
+          this.history_numbers = round_status.history_numbers.reverse()
+          this.history_numbers
           this.$refs.actions.disabled = false
           this.$refs.board.disabled = false
           this.spin_wheel()
@@ -665,7 +674,7 @@ export default {
         balance_str = balance_str.replace(/,/g, "");
         this.editBalance(balance_str)
         this.win_number = status.win_number
-        this.history_bets = status.user.history_bets
+        this.history_bets = status.user.history_bets.reverse()
         for (let i = 0; i < this.history_bets.length; i ++) {
           let round = this.history_bets[i]
           round.bet_chips = 0

@@ -7,6 +7,7 @@
 Choose which you want to bet and then submit your bet and transfer some money to the contract, wait for countdown to spin automatically. Each round has 60 blocks to wait, which is approximately 36 seconds. 
 If you don't want to transfer money for each bet confirmation, deposit near to the contract. Profit records in contract, it must be withdraw manually if you want.
 A maximum bet amount is set every round, to prevent large winning.
+Gas fee is collected from every already bet players in every round when it is time to spin.
 
 # Staking pool
 Staking pool is acting like a dealer in the game, players who think playing roulette is risking can stake money in here. When a player wins, the stake users lose their profits or shares, or on the opposite, stake users got profit.

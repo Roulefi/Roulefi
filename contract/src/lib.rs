@@ -104,7 +104,7 @@ pub struct RoundStatus {
     pub next_round_block_index: BlockHeight,
     pub bet_count: u32,                          // total bet counts
     pub win_number: u8,
-    pub history_numbers: Vec<HistoryNumber>
+    pub history_numbers: Vec<HistoryNumber>,
 }
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
