@@ -105,6 +105,7 @@ export default class Contract {
       bets_format.push(bet)
     }
     amount += 0.01
+    
     let balance = Number(this.from_yocto(this.status.user.balance))
     if (balance < amount) {
       let pay = String(parseInt((amount - balance) * 100)) + BET_AMOUNT
