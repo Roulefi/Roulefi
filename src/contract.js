@@ -3,7 +3,7 @@ import * as nearAPI from "near-api-js";
 import getConfig from "./config";
 const nearConfig = getConfig("development");
 const BET_AMOUNT =  "0000000000000000000000"; /* 0,01 ether, around $6 */
-const GAS = "3000000000000"; //300000000000000
+const GAS = "300000000000000"; //300000000000000
 
 export default class Contract {
 
