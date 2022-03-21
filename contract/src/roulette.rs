@@ -1,14 +1,4 @@
-//! This contract implements simple counter backed by storage on blockchain.
-//!
-//! The contract provides methods to [increment] / [decrement] counter and
-//! [get it's current value][get_num] or [reset].
-//!
-//! [increment]: struct.Counter.html#method.increment
-//! [decrement]: struct.Counter.html#method.decrement
-//! [get_num]: struct.Counter.html#method.get_num
-//! [reset]: struct.Counter.html#method.reset
 
-use std::collections::HashMap;
 use std::fmt::Debug;
 
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
@@ -71,28 +61,17 @@ pub fn check_win(number:u8, b: &Bet) -> bool {
 pub struct Bet {
     pub bet_type: u8,  
     pub number: u8,
-    pub chips: U128,  // 1 chip = 0.01 NEAR
+    pub chips: u128,  // 1 chip = 0.01 NEAR
 }
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug, Clone)]
-pub struct HistoryRoundBets {
-    pub bets: Vec<Bet>,
-    pub win_chips: U128,
-    pub win_number: u8,
-    pub time: U64,
-    pub round_index: BlockHeight
-}
-
-#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
-#[serde(crate = "near_sdk::serde")]
-#[derive(Debug, Clone)]
-pub struct HistoryNumber {
-    pub win_number: u8,
-    pub round_index: BlockHeight,
-    pub round_block_index: BlockHeight,
-    pub time: U64,
+pub struct Stake {
+    pub amount: u128,
+    pub time: u64,
+    pub profit: u128,
+    pub loss: u128,
 }
 
 
@@ -102,29 +81,26 @@ impl Contract {
 
     #[payable]
     pub fn bet(&mut self, bets: Vec<Bet>) {
-        assert!(!self.spinning, "wheel spinning, try later");
+        assert!(!self.round_status.spinning, "wheel spinning, try later");
         //let prev_storage = env::storage_usage();
-        let sender = env::predecessor_account_id();
-        let user = self.users.entry(sender.to_string()).or_insert(new_user());
+        let sender_id = env::predecessor_account_id();
+        let mut account = self.accounts.get(&sender_id).unwrap_or(new_user());
         assert!(bets.len() > 0, "you have 0 bets");
-        assert!(user.bets.len() == 0, "you've already bet");
-        let mut total:u128= 0;
+        assert!(account.bets.len() == 0, "you've already bet");
+        let mut total:u128 = 0;
         for item in bets.iter() {
             total += u128::from(item.chips);
             assert!(item.bet_type <= 5);
-            assert!(item.number <= self.number_range[item.bet_type as usize]); 
+            assert!(item.number <= NUMBER_RANGE[item.bet_type as usize]); 
         }
-        let balance = u128::from(user.balance) + env::attached_deposit();   // check if user's deposit amount and current trasaction's deposit are greater than the bets
-        assert!(balance >= total + 10000000000000000000000, "not enough balance");  // 0.01 Near for spinning gas fee
-        let bet_amount = self.bet_amount + total;
-        assert!(bet_amount < self.max_amount_allowed, "exceed max bet amount allowed");  // check if total bet amount is greater than the max amount allowed
-
-        self.bet_amount = bet_amount;
-        user.balance = U128::from(balance - total);  // the balance decrease when bet is confirmed
-        if user.bets.len() == 0 {
-            self.bet_users.push(sender);
-        }
-        user.bets = bets.clone();  
+        let balance = account.balance + env::attached_deposit();   // check if user's deposit amount and current trasaction's deposit are greater than the bets
+        assert!(balance >= total, "not enough balance"); 
+        self.round_status.bet_amount += total;
+        assert!(self.round_status.bet_amount < self.round_status.max_amount_allowed, "exceed max bet amount allowed");  // check if total bet amount is greater than the max amount allowed
+        account.balance = balance - total;  // the balance decrease when bet is confirmed
+        account.bets = bets;
+        self.accounts.insert(&sender_id, &account);
+        self.bet_accounts.push(&sender_id);
     }
 
 
@@ -133,18 +109,18 @@ impl Contract {
     and time to next_round_block_index, then call this method
     */
     pub fn spin_wheel(&mut self) {
-        assert!(env::block_index() > self.round_block_index + self.round_delta, "too quick to spin");
+        assert!(env::block_index() > self.round_status.current_round_block_index + self.config.round_delta, "too quick to spin");
         // let sender = env::predecessor_account_id();
         // let creator = env::current_account_id();
         // assert!(sender == creator, "not contract owner");
-        assert!(self.bet_users.len() > 0, "no bets");
-        self.spinning = true;
+        assert!(self.bet_accounts.len() > 0, "no bets");
+        self.round_status.spinning = true;
 
-        let player = self.bet_users.get(self.bet_users.len() - 1).unwrap();
-        let bets = self.users.get(player).unwrap().clone().bets;
+        let last_player_id = self.bet_accounts.get(self.bet_accounts.len() - 1).unwrap();
+        let bets = self.accounts.get(&last_player_id).unwrap().bets;
         let bet = bets.get(bets.len() - 1).unwrap();
         let nonce: Vec<u8> = vec![bet.number, bet.bet_type];
-        let hash = env::sha256(&[env::random_seed(), nonce, player[..].as_bytes().to_vec()].concat());  //make hash with nonce
+        let hash = env::sha256(&[env::random_seed(), nonce, last_player_id[..].as_bytes().to_vec()].concat());  //make hash with nonce
         let mut hash_bytes: [u8;4] = [0;4];
         for i in 0..4 {
             hash_bytes[i] = hash.get(i).unwrap().clone();
@@ -154,77 +130,60 @@ impl Contract {
         
         let mut total_bet:u128 = 0;
         let mut total_win:u128 = 0;
-        for player_str in self.bet_users.iter() {                 // check every bet if it wins
-            let mut user = self.users.get_mut(player_str).unwrap();
+        for player_id in self.bet_accounts.iter() {                 // check every bet if it wins
+            let mut account = self.accounts.get(&player_id).unwrap();
             let mut bet_amount = 0;
             let mut win_amount = 0;
-            for b in user.bets.iter() {
+            for b in account.bets.iter() {
                 let won = check_win(number, b);
                 bet_amount += u128::from(b.chips);
                 let mut win_chips = 0;
                 if won {
-                    win_chips = self.payouts[b.bet_type as usize] as u128 * u128::from(b.chips);
+                    win_chips = PAYOUTS[b.bet_type as usize] as u128 * u128::from(b.chips);
                     win_amount += win_chips.clone();
                     
                 }      
             }
-            user.balance = U128::from(u128::from(user.balance) + win_amount);
+            account.balance += win_amount;
             total_bet += bet_amount;
             total_win += win_amount;
-            user.history_bets.push(HistoryRoundBets{
-                bets: user.bets.clone(),
-                win_chips: U128::from(win_amount.clone()),
-                win_number: number,
-                time: U64::from(env::block_timestamp()),
-                round_index: self.round_index
-            }); 
-            user.bets.clear();
+            account.bets.clear();
+            self.accounts.insert(&player_id, &account);
         }
-        
-        self.history_numbers.push(HistoryNumber {
-            win_number: number,
-            round_index: self.round_index,
-            round_block_index: self.round_block_index,
-            time: U64::from(env::block_timestamp()),
-        });
         self.cal_profit(total_bet, total_win);
-        self.deal_history();
         
-        self.bet_users.clear();
-        self.bet_amount = 0;
-        
-        
-        self.round_block_index = env::block_index();
-        self.round_index += 1;
-        self.win_number = number;
-        self.spinning = false;
+        self.bet_accounts.clear();
+        self.round_status.bet_amount = 0;
+        self.round_status.current_round_block_index = env::block_index();
+        self.round_status.round_index += 1;
+        self.round_status.last_round_win_number = number;
+        self.round_status.spinning = false;
     }
 
     /*
     deposit near to play
     */
     #[payable]
-    pub fn deposit(&mut self, amount: U128) {                   
-        let sender = env::predecessor_account_id();
-        let user = self.users.entry(sender.to_string()).or_insert(new_user());
-        let amount = u128::from(amount);
-        assert!(amount > 0, "not enough amount!");
-        assert!(amount <= env::attached_deposit(), "not enough balance!");
-        user.balance = U128::from(u128::from(user.balance) + amount);
+    pub fn deposit(&mut self) {                   
+        let sender_id = env::predecessor_account_id();
+        let mut account = self.accounts.get(&sender_id).unwrap_or(new_user());
+        account.balance += env::attached_deposit();
+        self.accounts.insert(&sender_id, &account);
     }
 
     /*
     withdraw from balance
     */
     pub fn withdraw(&mut self, amount: U128) {                  
-        let sender = env::predecessor_account_id();
-        let user = self.users.get_mut(&sender).unwrap();
+        let sender_id = env::predecessor_account_id();
+        let mut account = self.accounts.get(&sender_id).expect("account not found");
         let amount = u128::from(amount);
-        assert!(amount <= u128::from(user.balance), "not enough balance");
+        assert!(amount <= account.balance, "not enough balance");
         assert!(amount > 0, "not enough amount!");
         assert!(amount <= env::account_balance(), "not enough balance!");
-        Promise::new(sender.to_string()).transfer(amount.clone());
-        user.balance = U128::from(u128::from(user.balance) - amount);
+        account.balance -= amount;
+        self.accounts.insert(&sender_id.clone(), &account);
+        Promise::new(sender_id).transfer(amount.clone());
     }
 
 }
@@ -278,7 +237,7 @@ mod tests {
         let bets: Vec<Bet> = vec![Bet {
             bet_type: 5,
             number: 0,
-            chips: U128::from(10000000000000000)
+            chips: 10000000000000000
         }];
         
         // println!("{}", contract.get_status());

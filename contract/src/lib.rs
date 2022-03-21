@@ -4,24 +4,32 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
+use near_sdk::collections::{Vector, LookupMap, UnorderedMap, UnorderedSet};
 use near_sdk::serde::{Serialize, Deserialize};
-use near_sdk::{BlockHeight, Gas, PanicOnDefault, Promise, env, near_bindgen};
+use near_sdk::{BlockHeight, Gas, PanicOnDefault, Promise, env, near_bindgen, BorshStorageKey};
 use near_sdk::{AccountId};
 use near_sdk::json_types::{U128, U64};
+use uint::construct_uint;
 
 near_sdk::setup_alloc!();
 
+pub mod internal;
 pub mod roulette;
-pub mod vault;
+pub mod dealer;
+pub mod view;
+pub mod treasury;
 use crate::roulette::*;
-use crate::vault::*;
 
-pub fn new_user() -> User {
-    User {
+construct_uint! {
+    pub struct U256(4);
+}
+
+pub fn new_user() -> Account {
+    Account {
         bets: Vec::new(),
-        balance: U128::from(0),
-        history_bets: Vec::new(),
+        balance: 0,
         stakes: Vec::new(),
+        last_bet_time: 0,
     }
     
 }
@@ -48,48 +56,29 @@ pub struct Contract {
         modulus: 0 for even, 1 for odd
         number: number
     */
-    pub creator: AccountId,
-    pub max_amount_allowed: u128,   // max bet amount per round
-    pub amount_allowed_rate: f32,   // max_amount_allowed = (stake_amount + profit_amount) * amount_allowed_rate
-    pub number_range: [u8; 6],      // the number range for every type of bet
-    pub payouts: [u8; 6],           // 6 types of payout
-    pub treasury_threshold: u128,   // treasury amount threshold
-    pub treasury_shares: [f32; 3],   // treasury shares
-    pub last_treasury_time: u64,
-    pub min_lock_time: u32,         // min time for staking pool to withdraw
-    pub step_time: Vec<u32>,        // a user's share in the pool will rise after each step_time
-    pub step_rate: Vec<f32>,        // the share multiplier for each step_time
-    pub treasury_rate: f32,         // the percentage for every round profit in the pool
-    pub round_block_index: BlockHeight,  // timestamp when in a new round
-    pub round_delta: BlockHeight,   // time period between rounds
-    pub round_index: BlockHeight,   // total round index
+    owner_id: AccountId,
+    config: Config,
+    round_status: RoundStatus,
+    treasury_status: TreasuryStatus,
 
-    pub bet_users: Vec<AccountId>,  // users who have bets
-    pub stake_users: Vec<AccountId>, // users who have stakes
-    pub win_number: u8,             // win number for the last round
-    pub users: HashMap<AccountId, User>, // users data
-    pub bet_amount: u128,           // total bet amount in the given round
-    pub stake_amount: u128,         // total stake amount
-    pub treasury_amount: u128,      // total treasury amount
-    pub profit_amount: u128,        // total profit amount
-    pub history_numbers: Vec<HistoryNumber>, //history number
-    pub history_limit_count: u32,
-    pub gas_per_player: u128,
-    pub spinning: bool,
+    bet_accounts: Vector<AccountId>,  // users who have bets
+    stake_accounts: UnorderedSet<AccountId>, // users who have stakes
+    accounts: UnorderedMap<AccountId, Account>, // users data
+    
 }
 
-/*
-To show the basic user info and contract info
-*/
-#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
-#[serde(crate = "near_sdk::serde")]
-#[derive(Debug)]
-pub struct Status {
-    pub balance: U128,              // contract balance
-    pub bet_amount: U128,           // total bet amount in this round
-    pub max_bet_amount: U128,       // the limit for bet_amount
-    pub stake_amount: U128,         // total stake amount
-    pub user: User                  // user data
+#[near_bindgen]
+#[derive(PanicOnDefault, BorshDeserialize, BorshSerialize)]
+pub struct Config {
+    treasury_threshold: u128,   // treasury amount threshold
+    treasury_shares: Vec<u32>,   // treasury shares
+    min_lock_time: u32,         // min time for staking pool to withdraw
+    step_time: Vec<u64>,        // a user's share in the pool will rise after each step_time
+    step_rate: Vec<u32>,        // the share multiplier for each step_time
+    treasury_rate: u32,         // the percentage for every round profit in the pool
+    amount_allowed_rate: f32,   // max_amount_allowed = (stake_amount + profit_amount) * amount_allowed_rate
+    gas_per_player: u128,
+    round_delta: u64
 }
 
 /*
@@ -99,127 +88,88 @@ round info for spinning
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug)]
 pub struct RoundStatus {
-    pub current_block_index: BlockHeight,
-    pub round_index: BlockHeight,
-    pub next_round_block_index: BlockHeight,
-    pub bet_count: u32,                          // total bet counts
-    pub win_number: u8,
-    pub history_numbers: Vec<HistoryNumber>,
+    current_round_block_index: BlockHeight,
+    round_index: BlockHeight,
+    next_round_block_index: BlockHeight,
+    last_round_win_number: u8,
+    spinning: bool,
+    max_amount_allowed: u128,
+    bet_amount: u128,
+    stake_amount: u128,
+    profit_amount: u128,
+    loss_amount: u128,
+}
+
+#[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+#[derive(Debug)]
+pub struct TreasuryStatus {
+    last_treasury_time: u64,
+    treasury_amount: u128,
 }
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 #[derive(Debug, Clone)]
-pub struct User {
-    pub bets: Vec<Bet>,               // all bets
-    pub balance: U128,                // user deposit in the contract
-    pub history_bets: Vec<HistoryRoundBets>,
-    pub stakes: Vec<Stake>,           // all stakes
+pub struct Account {
+    bets: Vec<Bet>,               // all bets
+    balance: u128,                // user deposit in the contract
+    stakes: Vec<Stake>,           // all stakes
+    last_bet_time: u64
 }
 
+#[derive(BorshSerialize, BorshStorageKey)]
+enum StorageKey {
+    BetAccounts,
+    StakeAccounts,
+    Accounts
+}
 
+const PAYOUTS: [u8; 6] = [2,3,3,2,2,36];
+const NUMBER_RANGE: [u8; 6] = [1,2,2,1,1,36];
 
 #[near_bindgen]
 impl Contract {
     #[init]
     pub fn new() -> Self {
         assert!(env::state_read::<Self>().is_none(), "Already initialized");
-        Self {
-            creator: "bhc.testnet".to_string(),
-            payouts: [2,3,3,2,2,36],
-            number_range: [1,2,2,1,1,36],
-            amount_allowed_rate: 0.1,
-            max_amount_allowed: (env::account_balance() as f64 * 0.1) as u128, 
-            min_lock_time: 0,                       // now it is not working
-            step_time: vec![0, 604800, 2592000],    // one week , one month
-            step_rate: vec![0.0, 0.05, 0.2],        // 5%, 20%
-            treasury_rate: 0.1,
-            treasury_threshold: 10000000000000000000000000000,  // 10k
-            treasury_shares: [0.4, 0.4, 0.2],    // gamers, stake users, team
-            last_treasury_time: 0,
-            history_limit_count: 20,
+        let this = Self {
+            owner_id: "bhc.testnet".to_string(),
+            config: Config {
+                amount_allowed_rate: 0.1,
+                min_lock_time: 0,                       // now it is not working
+                step_time: vec![0, 604800, 2592000],    // one week , one month
+                step_rate: vec![0, 5, 20],        // 5%, 20%
+                treasury_rate: 10,
+                treasury_threshold: 10000000000000000000000000000,  // 10k
+                treasury_shares: vec![40, 40, 20],    // gamers, stake users, team
+                gas_per_player: 10000000000000000000000,
+                round_delta: 60,
+            },
+            round_status: RoundStatus {
+                round_index: 0,
+                current_round_block_index: env::block_index(),
+                next_round_block_index: 0,                 //self.round_delta + env::block_index(),
+                last_round_win_number: 0,
+                max_amount_allowed: 0, ////(env::account_balance() as f64 * 0.1) as u128, 
+                bet_amount: 0,
+                stake_amount: 0,
+                profit_amount: 0,
+                loss_amount: 0,
+                spinning: false,
+            },
+            treasury_status: TreasuryStatus {
+                last_treasury_time: 0,
+                treasury_amount: 0,
+            },
+            bet_accounts: Vector::new(StorageKey::BetAccounts),
+            stake_accounts: UnorderedSet::new(StorageKey::StakeAccounts),
+            accounts: UnorderedMap::new(StorageKey::Accounts),
 
-            bet_users: Vec::new(),
-            stake_users: Vec::new(),
-            win_number: 0,
-            
-            users: HashMap::new(),
-            bet_amount: 0,
-            stake_amount: 0,
-            treasury_amount: 0,
-            profit_amount: 0,
-            round_block_index: 0,
-            round_delta: 60,
-            round_index: 0,
-            history_numbers: Vec::new(),
-            gas_per_player: 10000000000000000000000,
-            spinning: false,
-        }
-    }
-
-    // #[init(ignore_state)]
-    // pub fn migrate_state(new_data: String) -> Self {
-    //     // Deserialize the state using the old contract structure.
-    //     let old_contract: OldContract = env::state_read().expect("Old state doesn't exist");
-    //     // Verify that the migration can only be done by the owner.
-    //     // This is not necessary, if the upgrade is done internally.
-    //     assert!(
-    //         env::predecessor_account_id() == old_contract.owner_id,
-    //         "Can only be called by the owner"
-    //     );
-
-    //     // Create the new contract using the data from the old contract.
-    //     Self { owner_id: old_contract.owner_id, data: old_contract.data, new_data }
-    // }
-
-    pub fn get_status(&self, sender: AccountId) -> Status {
-        let user = self.users.get(&sender);
-        let user: User = match user {
-            Some(v) => v.clone(),
-            None => new_user()
         };
-        let status = Status {     // when can we play again
-            balance: env::account_balance().into(),
-            bet_amount: U128::from(self.bet_amount),
-            max_bet_amount: U128::from(self.max_amount_allowed),
-            stake_amount: U128::from(self.stake_amount),
-            
-            user: user
-        };
-        status
+        this
     }
 
-    pub fn get_round_status(&self) -> RoundStatus {
-        RoundStatus {
-            current_block_index: env::block_index(),
-            round_index: self.round_index,
-            next_round_block_index: (self.round_block_index + self.round_delta) as BlockHeight,
-            bet_count: self.bet_users.len() as u32,
-            win_number: self.win_number,
-            history_numbers: self.history_numbers.clone(),
-        }
-    }
-
-}
-
-impl Contract { 
-    pub(crate) fn deal_history(&mut self) {
-        if self.history_numbers.len() > self.history_limit_count as usize {
-            let delta = self.history_numbers.len() - self.history_limit_count as usize;
-            for i in 0..delta {
-                self.history_numbers.remove(i);
-            }
-        }
-        for player_str in self.bet_users.iter() {
-            let mut user = self.users.get_mut(player_str).unwrap();
-            if user.history_bets.len() > self.history_limit_count as usize {
-                let delta = self.history_numbers.len() - self.history_limit_count as usize;
-                for i in 0..delta {
-                    self.history_numbers.remove(i);
-                }
-            }
-        }
-    }
 }
 
 // use the attribute below for unit tests
@@ -271,7 +221,7 @@ mod tests {
         let bets: Vec<Bet> = vec![Bet {
             bet_type: 5,
             number: 0,
-            chips: U128::from(10000000000000000)
+            chips: 10000000000000000
         }];
         
         // println!("{}", contract.get_status());

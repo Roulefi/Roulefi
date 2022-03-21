@@ -1,7 +1,7 @@
 pub use near_sdk::json_types::{Base64VecU8, ValidAccountId, WrappedDuration, U64};
 use near_sdk_sim::{call, view, deploy, init_simulator, ContractAccount, UserAccount};
 use near_roulette::ContractContract;
-use near_roulette::{*, roulette::*, vault::*};
+use near_roulette::{*, roulette::*, dealer::*};
 use near_sdk::json_types::{U128};
 use near_sdk_sim::to_yocto;
 
