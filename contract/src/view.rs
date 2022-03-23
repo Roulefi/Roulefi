@@ -40,6 +40,8 @@ pub struct RoundStatusInfo {
     next_round_block_index: U64,
     last_round_win_number: u8,
     spinning: bool,       
+    bet_amount: U128,           // total bet amount in this round
+    bet_count: u32,
 }
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
@@ -47,8 +49,6 @@ pub struct RoundStatusInfo {
 #[derive(Debug)]
 pub struct ContractStatusInfo {
     balance: U128,
-    bet_amount: U128,           // total bet amount in this round
-    bet_count: u32,
     max_bet_amount: U128,       // the limit for bet_amount
     stake_amount: U128,         // total stake amount
     profit_amount: U128,    
@@ -86,8 +86,6 @@ impl Contract {
     pub fn get_contract_status(&self) -> ContractStatusInfo {
         let status = ContractStatusInfo {     
             balance: env::account_balance().into(),
-            bet_amount: U128::from(self.round_status.bet_amount),
-            bet_count: self.bet_accounts.len() as u32,
             max_bet_amount: U128::from(self.round_status.max_amount_allowed),
             stake_amount: U128::from(self.round_status.stake_amount),
             profit_amount: U128::from(self.round_status.profit_amount),
@@ -101,6 +99,8 @@ impl Contract {
             current_round_block_index: U64::from(self.round_status.current_round_block_index),
             round_index: U64::from(self.round_status.round_index),
             next_round_block_index: U64::from(self.round_status.current_round_block_index + self.config.round_delta),
+            bet_amount: U128::from(self.round_status.bet_amount),
+            bet_count: self.bet_accounts.len() as u32,
             spinning: self.round_status.spinning,
             last_round_win_number: self.round_status.last_round_win_number,
         }
