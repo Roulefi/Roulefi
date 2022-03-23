@@ -1,14 +1,11 @@
 <template>
   <div class="index" @click="clear_button()"> 
-    <div class="background">
-    </div>
     <div class="header">
-      <div class="logo">
-      </div>
-      <div class="login">
-        <button @click="to_game()" v-if="login">GAME</button>
-        <button @click="sign_out()" v-if="login">SIGNOUT</button> 
-        <button @click="sign_in()" v-if="!login">SIGNIN</button>
+      <img class="logo" src="@/assets/logo.png">
+      <div class="nav" @click.stop>
+        <div class="nav-item" @click="to_game()" v-if="login">GAME</div>
+        <div class="nav-item" @click="sign_out()" v-if="login">SIGNOUT</div> 
+        <div class="nav-item" @click="sign_in()" v-if="!login">SIGNIN</div>
       </div>
     </div>
     <div class="index-wrapper">
@@ -16,23 +13,27 @@
         <div class="balance" style="margin-right: 30px;">YOUR STAKE<p><span>{{my_stake_amount}}</span></p></div>
         <div class="bet">TOTAL STAKE<p><span>{{stake_amount}}</span></p></div>
       </div>
-      <div class="line" style="justify-content: center" v-for="(item, i) in stakes" :key="i">
-        <div class="stake-wrapper">
-          <div class="stake" style="margin-right: 30px">
-            AMOUNT: {{Number(contract.from_yocto(item.amount).replace(/,/g, "")).toFixed(2)}}
-          </div>
-          <div class="stake" style="margin-right: 30px">
-            PROFIT: {{Number(contract.from_yocto(item.profit).replace(/,/g, "")).toFixed(2)}}
-          </div>
-          <div class="wallet-unit" @click.stop>
-            <div class="input-wrapper" v-if="unstake_visible[i]">
-              <input v-model="unstake_text"/>
+      <div class="list">
+        <div class="item" v-for="(item, i) in stakes" :key="i">
+            <div class="left">
+              <div class="stake" style="margin-right: 30px">
+                AMOUNT: {{Number(contract.from_yocto(item.amount).replace(/,/g, "")).toFixed(2)}}
+              </div>
+              <div class="stake" style="margin-right: 30px">
+                PROFIT: {{Number(contract.from_yocto(item.profit).replace(/,/g, "")).toFixed(2)}}
+              </div>
             </div>
-            <button @click="toggle_unstake(i)">UNSTAKE</button>
-          </div>
-          <div style="margin-right: 30px">
-            <button @click="harvest(i)">HARVEST</button>
-          </div>
+            <div class="wallet-unit" @click.stop>
+              <div class="input-wrapper" v-if="unstake_visible[i]">
+                <input v-model="unstake_text"/>
+              </div>
+              <div class="button" @click="toggle_unstake(i)">UNSTAKE</div>
+            </div>
+            <!--
+            <div style="margin-right: 30px">
+              <button @click="harvest(i)">HARVEST</button>
+            </div>
+            -->
         </div>
       </div>
       <div class="line" style="justify-content: center">
@@ -119,12 +120,13 @@ export default {
 
     async update() {
       if (this.login) {
-        let status = await this.contract.get_status()
-        this.status = status
+        let account_status = await this.contract.get_account_status()
+        let contract_status = await this.contract.get_contract_status()
+        // this.status = status
         console.log(status)
-        this.bet_amount = this.contract.from_yocto(status.bet_amount).replace(/,/g, "")
-        this.stake_amount = this.contract.from_yocto(status.stake_amount).replace(/,/g, "")
-        this.stakes = this.status.user.stakes
+        this.bet_amount = this.contract.from_yocto(contract_status.bet_amount).replace(/,/g, "")
+        this.stake_amount = this.contract.from_yocto(contract_status.stake_amount).replace(/,/g, "")
+        this.stakes = account_status.stakes
         let total = 0
         this.unstake_visible = []
         for (let i = 0; i < this.stakes.length; i ++) {
@@ -173,6 +175,7 @@ export default {
       }
       try {
         await this.contract.unstake(amount, index)
+        this.unstake_text = "";
         window.alert("Unstake Success")
       } catch {
         window.alert("Transaction Expired")
@@ -181,10 +184,15 @@ export default {
       this.update()
     },
 
-    toggle_unstake(index) {
+    async toggle_unstake(index) {
+      for(let i=0;i<this.unstake_visible.length;i++){
+        if(i!=index){
+           this.unstake_visible[i] = false;
+        }
+      }
       this.unstake_visible[index] = !this.unstake_visible[index]
-      if (!this.unstake_visible[index]) {
-        this.unstake(this.unstake_text, index)
+      if (this.unstake_visible[index] && this.unstake_text!=0) {
+        await this.unstake(this.unstake_text, index)
       }
       this.$forceUpdate()
     },
@@ -238,27 +246,35 @@ export default {
   min-height: 100vh;
   height: 100%;
   place-items: center;
-}
-
-.background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
   background-color: green;
-  z-index: -1;
 }
 
 .header {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 98%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    position: fixed;
+    right: 40px;
+    top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header .logo{
+    width:50px;
+  }
+
+  .nav{
+    display: flex;
+  }
+  .nav-item{
+    margin-left:20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size:14px;
+    color:#FFF;
+    font-weight:bold;
+    cursor:pointer;
+  }
 
 .index-wrapper {
   width: 100%;
@@ -273,6 +289,32 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size:16px;
+  font-weight:bold;
+}
+
+.list{
+  max-height:50vh;
+  overflow-y:scroll;
+  display: flex;
+  flex-direction:column;
+  align-items:center;
+}
+.list .item{
+  width:75%;
+  height:50px;
+  margin-top:20px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #fff;
+  align-items: center;
+  font-size:16px;
+  color:#FFF;
+  padding:0 20px;
+}
+.list .item .left{
+  display: flex;
 }
 
 
@@ -391,20 +433,35 @@ button:hover {
   justify-content: center;
   align-items: center;
 }
+.wallet-unit .button{
+  border:1px solid #FFF;
+  border-radius:5px;
+  font-size:12px;
+  font-weight:bold;
+  width:80px;
+  height:30px;
+  line-height:30px;
+  cursor: pointer;
+}
+
+.wallet-unit .button:hover{
+  background: rgba(0,0,0,0.2);
+}
 
 .input-wrapper {
   width: 200px;
-  
   border: none;
-  outline: 1px solid #fff;
-  padding: 3px 21px;
+  outline: none;
+  padding: 0 10px;
   margin: 0;
   text-decoration: none;
   text-transform: uppercase;
   background: rgba(0,0,0,0.2);
   cursor: pointer;
-  
+  height:30px;
+  line-height:30px;
   transition: background .25s ease-in-out,transform .15s ease;
+  margin-right:20px;
 }
 
 .input-wrapper input {
@@ -422,10 +479,12 @@ button:hover {
     width: 100%;
     font-family: "Oswald",sans-serif;
     font-weight: 400;
-    line-height: 11px;
+    height:30px;
+    line-height:30px;
     color: #fff;
     font-weight: 500;
-    font-size: 24px;
+    font-size: 14px;
+    border-radius:5px;
 }
 
 .spin-ani {
@@ -459,23 +518,5 @@ button:hover {
     transform: rotate(360deg);
   }
 }
-
-.stake {
-  color: #fff;
-  font-weight: 500;
-  font-size: 24px;
-}
-
-.stake-wrapper {
-  width: 80%;
-  border-radius: 20px;
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  border: 1px solid #fff;
-  margin-top: 20px;
-  align-items: center;
-}
-
 
 </style>

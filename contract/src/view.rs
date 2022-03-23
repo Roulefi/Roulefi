@@ -82,7 +82,6 @@ impl Contract {
         status
     }
     
-
     pub fn get_contract_status(&self) -> ContractStatusInfo {
         let status = ContractStatusInfo {     
             balance: env::account_balance().into(),

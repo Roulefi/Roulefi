@@ -1,4 +1,4 @@
-const CONTRACT_NAME = 'roulette.bhc3.testnet' || 'asdf.test'; /* TODO: change this to your account */
+const CONTRACT_NAME = 'app.roulefi.testnet' || 'asdf.test'; /* TODO: change this to your account */
 
 function getConfig (env) {
   switch (env) {
