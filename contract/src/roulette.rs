@@ -6,8 +6,7 @@ use near_sdk::serde::{Serialize, Deserialize};
 use near_sdk::{PanicOnDefault, Promise, env, log, near_bindgen};
 use near_sdk::{AccountId};
 use near_sdk::json_types::{U128, U64};
-use chrono::prelude::*;
-use std::num;
+use crate::view::BetInfo;
 use crate::*;
 
 
@@ -80,8 +79,9 @@ pub struct Stake {
 impl Contract {
 
     #[payable]
-    pub fn bet(&mut self, bets: Vec<Bet>) {
+    pub fn bet(&mut self, bets: Vec<BetInfo>, round_index: U64) {
         assert!(!self.round_status.spinning, "wheel spinning, try later");
+        assert!(self.round_status.round_index == u64::from(round_index), "uncorrect round index");
         //let prev_storage = env::storage_usage();
         let sender_id = env::predecessor_account_id();
         let mut account = self.accounts.get(&sender_id).unwrap_or(new_user());
@@ -98,7 +98,13 @@ impl Contract {
         self.round_status.bet_amount += total;
         assert!(self.round_status.bet_amount < self.round_status.max_amount_allowed, "exceed max bet amount allowed");  // check if total bet amount is greater than the max amount allowed
         account.balance = balance - total;  // the balance decrease when bet is confirmed
-        account.bets = bets;
+        account.bets = bets.iter().map(|bet| {
+            Bet {
+                chips: u128::from(bet.chips),
+                bet_type: bet.bet_type,
+                number: bet.number
+            }
+        }).collect();
         self.accounts.insert(&sender_id, &account);
         self.bet_accounts.push(&sender_id);
     }
@@ -108,11 +114,9 @@ impl Contract {
     this method is controlled by a script. the script keeps getting round status until there is any bet
     and time to next_round_block_index, then call this method
     */
-    pub fn spin_wheel(&mut self) {
+    pub fn spin_wheel(&mut self, round_index: U64) {
+        assert!(self.round_status.round_index == u64::from(round_index), "uncorrect round index");
         assert!(env::block_index() > self.round_status.current_round_block_index + self.config.round_delta, "too quick to spin");
-        // let sender = env::predecessor_account_id();
-        // let creator = env::current_account_id();
-        // assert!(sender == creator, "not contract owner");
         assert!(self.bet_accounts.len() > 0, "no bets");
         self.round_status.spinning = true;
 
