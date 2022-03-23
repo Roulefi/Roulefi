@@ -1,18 +1,17 @@
 <template>
   <div class="index" @click="clear_button()"> 
-    <div class="background">
-    </div>
+    <!--header-->
     <div class="header">
-      <div class="logo">
-      </div>
-      <div class="login">
-        <button @click="to_stake()" v-if="login">STAKE</button>
-        <button @click="sign_out()" v-if="login">SIGNOUT</button> 
-        <button @click="sign_in()" v-if="!login">SIGNIN</button>
+      <img class="logo" src="@/assets/logo.png">
+      <div class="nav" @click.stop>
+        <div class="nav-item" @click="to_stake()" v-if="login">STAKE</div>
+        <div class="nav-item" @click="sign_out()" v-if="login">SIGNOUT</div> 
+        <div class="nav-item" @click="sign_in()" v-if="!login">SIGNIN</div>
       </div>
     </div>
+    <!--content-->
     <div class="index-wrapper">
-      <div class="line">
+      <div class="line line-one">
         <div class="left">
           <div class="wheel">
             <div class="place-bet" ref="board">
@@ -314,7 +313,7 @@
           </div>
         </div>
       </div>
-      <div class="line">
+      <div class="line" style="margin-top:40px;">
         <div class="left">
           <div class="info">
             <div class="balance">BALANCE<p><span class="padded">{{balance_zeros}}</span><span>{{balance_amount}}</span></p></div>
@@ -327,35 +326,41 @@
             <button aria-label="Clear Board" @click="clear()">Clear</button>
             <button aria-label="Undo" @click="undo()">undo</button>
             <button aria-label="Clear Board" @click="bet_submit()">BET</button>
-            <!-- <button aria-label="Spin the Wheel" class="spin" @click="spin_wheel()"><svg viewBox="0 0 100 100" :class="{'ball-ani': spinning}"><circle class="hover" fill="rgba(0,0,0,0.1)" cx="50" cy="50" r="50" stroke-width="0"></circle><g transform="translate(5,5)"><path d="M87.954 47.938c-2.888 10.131-8.871 18.949-16.871 25.374a50.175 50.175 0 01-13.916 7.917h11.445c10.596-6.92 17.972-18.354 19.386-31.579-.009-.572-.015-1.145-.044-1.712zM21.388 8.771C10.792 15.692 3.417 27.126 2.002 40.35c.009.572.017 1.145.046 1.713 2.885-10.131 8.871-18.95 16.868-25.376a50.307 50.307 0 0113.917-7.916H21.388z"></path></g><circle fill="none" cx="50" cy="50" r="43.25" stroke-width="1"></circle><text x="50%" y="50%" text-anchor="middle" dy=".33em">Spin</text></svg>
-            </button> -->
           </fieldset>
         </div>
       </div>
-      <div class="line">
-        <div class="wallet-wrapper">
-          <div class="wallet-unit" @click.stop>
-            <div class="input-wrapper" v-if="deposit_visible">
-              <input v-model="deposit_text"/>
-            </div>
-            <button @click="toggle_deposit()">{{deposit_visible ? 'CONFIRM':'DEPOSIT'}}</button>
-          </div>
-          <div class="wallet-unit" @click.stop>
-            <div class="input-wrapper" v-if="withdraw_visible">
-              <input v-model="withdraw_text"/>
-            </div>
-            <button @click="toggle_withdraw()">{{withdraw_visible ? 'CONFIRM':'WITHDRAW'}}</button>
-          </div>
-          <div>1 chip = 0.01 NEAR</div>
+    </div>
+    <!--menu-->
+    <div class="menu" @click.stop>
+      <div class="menu-item" @click="toggle_deposit()">DEPOSIT</div>
+      <div class="menu-item" @click="toggle_withdraw()">WITHDRAW</div>
+      <div class="menu-item" @click="toggle_history()">{{history_visible ? 'HIDE HISTORY':'SHOW HISTORY'}}</div>
+    </div>   
+    <!--mask-->
+    <div class="mask" v-if="deposit_visible || withdraw_visible || history_visible" @click.stop>
+
+      <div class="mask-content" v-if="deposit_visible">
+        <input v-model="deposit_text"/>
+        <div class="button-box">
+          <div class="button" @click="deposit_visible=false">cancel</div>
+          <div class="button" @click="toggle_deposit()">confirm</div>
         </div>
       </div>
-      <div class="line" style="margin-top: 30px;">
-        <div style="width: 100%;display: flex; justify-content:center">
-          <button @click="toggle_history()">{{history_visible ? 'HIDE HISTORY':'SHOW HISTORY'}}</button>
+      <div class="mask-content mask-content-withdraw" v-if="withdraw_visible">
+        <input v-model="withdraw_text"/>
+        <div class="tip">1 chip = 0.01 NEAR</div>
+        <div class="button-box">
+          <div class="button" @click="withdraw_visible=false">cancel</div>
+          <div class="button" @click="toggle_withdraw()">confirm</div>
         </div>
       </div>
-      <div class="line" v-if="history_visible" style="padding-bottom: 100px;">
-        <div class="left">
+      <div class="mask-content mask-content-history" v-if="history_visible">
+        <img class="close-btn" @click="history_visible=false" src="@/assets/close.png">
+        <div class="tap-box">
+          <div :class="{'active':current_type=='number'}" @click="current_type='number'">number</div>
+          <div :class="{'active':current_type=='bet'}" @click="current_type='bet'">bet</div>
+        </div>
+        <div class="list" v-if="current_type=='number'">
           <div class="history-wrapper" v-for="(number, i) in history_numbers" :key="i">
             <div class="history" style="margin-right: 30px">
               ROUND: {{number.round_index}}
@@ -365,7 +370,7 @@
             </div>
           </div>
         </div>
-        <div class="right">
+        <div class="list" v-if="current_type=='bet'">
           <div class="history-wrapper" v-for="(number, i) in history_bets" :key="i">
             <div class="history" style="margin-right: 30px">
               ROUND: {{number.round_index}}
@@ -387,1069 +392,1225 @@
 </template>
 
 <script>
-import Contract from '../contract'
-
-const CHIP_VALUES = [1, 5, 10, 20, 50, 100, 500, 1000, 2000, 5000];
-
-const COLORS = [
-  "#357f9c",
-  "#aa2f2a",
-  "#31ba9c",
-  "#d40f83",
-  "#412ebc",
-  "#2d3b2c",
-  "#993cae",
-  "#d45c20",
-  "#cec440",
-  "#2c9e24"
-];
-
-const DISPLAY_VALUES = {
-  1000: "1K",
-  2000: "2K",
-  5000: "5K"
-};
-
-const createMutateStyle = (top = 0, left = 0, deg = 0) => {
-  top = (top * 15).toFixed() + "%";
-  left = (left * 15).toFixed() + "%";
-  // top = "0%";
-  // left = "0%";
-  deg = (deg * 50).toFixed();
-  return {
-    top,
-    left,
-    transform: `rotate(${deg}deg)`
+  import Contract from '../contract'
+  import wampApi from "../wamp/api.js";
+  const CHIP_VALUES = [1, 5, 10, 20, 50, 100, 500, 1000, 2000, 5000];
+  const COLORS = [
+    "#357f9c",
+    "#aa2f2a",
+    "#31ba9c",
+    "#d40f83",
+    "#412ebc",
+    "#2d3b2c",
+    "#993cae",
+    "#d45c20",
+    "#cec440",
+    "#2c9e24"
+  ];
+  const DISPLAY_VALUES = {
+    1000: "1K",
+    2000: "2K",
+    5000: "5K"
   };
-};
-
-function Chip(height, width, value, style) {
-  const color = COLORS[CHIP_VALUES.indexOf(value)] || "black";
-  const text = DISPLAY_VALUES[value] || value;
-  return String.prototype.concat.call(
-    "<div className='chip' style='" + style + "'>",
-      "<svg height=" + height + " width=" + width + " viewBox='0 0 60 60'>",
-        "<circle opacity='.3' fill='#231F20' cx='30' cy='31' r='27.5' />",
-        "<circle fill=" + color +" cx='30' cy='30' r='26.5' />",
-        "<g fill='#FFF'>",
-          "<path d='M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z' />",
-        "</g>",
-        "<text fill='#FEFEFE' x='50%' y='50%' fontSize='15' fontWeight='500' textAnchor='middle' dy='.33em' style='text-anchor: middle;'>",
-          text,
-        "</text>",
-      "</svg>",
-    "<div>"
-  )
-}
-
-function check_win(number, b) {
-    let won = false;
-    if (number == 0) {
-        won = b.bet_type == 5 && b.number == 0;                   /* bet on 0 */
-    } else {
-    if (b.bet_type == 5) { 
-        won = b.number == number;                              /* bet on number */
-    } else if (b.bet_type == 4) {
-        if (b.number == 0) { won = number % 2 == 0; }              /* bet on even */
-        if (b.number == 1) { won = number % 2 == 1; }              /* bet on odd */
-    } else if (b.bet_type == 3) {            
-        if (b.number == 0) { won = number <= 18; }                /* bet on low 18s */
-        if (b.number == 1) { won = number >= 19; }                 /* bet on high 18s */
-    } else if (b.bet_type == 2) {                               
-        if (b.number == 0) { won = number <= 12; }                 /* bet on 1st dozen */
-        if (b.number == 1) { won = number > 12 && number <= 24; }  /* bet on 2nd dozen */
-        if (b.number == 2) { won = number > 24; }                  /* bet on 3rd dozen */
-    } else if (b.bet_type == 1) {               
-        if (b.number == 0) { won = number % 3 == 1; }              /* bet on left column */
-        if (b.number == 1) { won = number % 3 == 2; }              /* bet on middle column */
-        if (b.number == 2) { won = number % 3 == 0; }              /* bet on right column */
-    } else if (b.bet_type == 0) {
-        if (b.number == 0) {                                     /* bet on black */
-          if (number <= 10 || number >= 20 && number <= 28) {
-              won = number % 2 == 0;
-          } else {
-              won = number % 2 == 1;
-          }
-        } else {                                                 /* bet on red */
-          if (number <= 10 || number >= 20 && number <= 28) {
-              won = number % 2 == 1;
-          } else {
-              won = number % 2 == 0;
-          }
-        }
-    }
-    }
-    return won
-}
-
-// function reverse(arr) {
-//   let new_arr = []
-//   for (let i = arr.length - 1; i >= 0; i --) {
-//     new_arr.push(arr[i])
-//   }
-//   return new_arr
-// }
-
-export default {
-  
-  data() {
+  const createMutateStyle = (top = 0, left = 0, deg = 0) => {
+    top = (top * 15).toFixed() + "%";
+    left = (left * 15).toFixed() + "%";
+    // top = "0%";
+    // left = "0%";
+    deg = (deg * 50).toFixed();
     return {
-      login: false,
-      accountId: '',
-      contract: {},
-      bets: [],
-      last_bets: [],
-      amount_select: 10,
-      balance_zeros: "000000",
-      balance_amount: 0,
-      balance: 0,
-      bet_zeros: "000000",
-      bet_amount: 0,
-      bet_val: 0,
-      deposit_text: 100,
-      withdraw_text: 100,
-      deposit_visible: false,
-      withdraw_visible: false,
-      spinning: false,
-      already_bet: false,
-      win_number: 0,
-      wheelSpinCounter: 0,
-      lastPosition: 0,
-      interval: {},
-      time_interval: {},
-      round_index: 0,
-      remain_time: 0,
-      next_round_block_index: 0,
-      current_block_index: 0,
-      waiting: false,
-      bet_disabled: false,
-      history_visible: false,
-      history_numbers: [],
-      history_bets: [],
-    }
-  },
-
-  async mounted() {
-    this.contract = new Contract()
-    await this.contract.init()
-    
-    this.init()
-    await this.initLogin()
-    this.initBet()
-    this.update()
-    this.deal_href()
-    this.wait_for_spin()
-  },
-
-  async destroyed() {
-    clearInterval(this.interval)
-    clearInterval(this.time_interval)
-  },
-
-  methods: {
-    init() {
-      for (let i = 0; i <= 36; i ++) {
-        let div = document.getElementById('n5' + i)
-        div.onclick = () => { this.bet(i, 5, div) }
-      }
-      for (let i = 0; i <= 2; i ++) {
-        let div = document.getElementById('n2' + i)
-        div.onclick = () => { this.bet(i, 2, div) }
-      }
-      for (let i = 0; i <= 2; i ++) {
-        let div = document.getElementById('n1' + i)
-        div.onclick = () => { this.bet(i, 1, div) }
-      }
-      document.getElementById('n30').onclick = () => { this.bet(0, 3, document.getElementById('n30')) }
-      document.getElementById('n40').onclick = () => { this.bet(0, 4, document.getElementById('n40')) }
-      document.getElementById('n41').onclick = () => { this.bet(1, 4, document.getElementById('n41')) }
-      document.getElementById('n31').onclick = () => { this.bet(1, 3, document.getElementById('n31')) }
-      document.getElementById('n01').onclick = () => { this.bet(1, 0, document.getElementById('n01')) }
-      document.getElementById('n00').onclick = () => { this.bet(0, 0, document.getElementById('n00')) }
-    },
-
-    async initLogin() {
-      let login = localStorage.getItem("login")
-      let accountId = await this.contract.is_signed_in()
-      this.login = login || accountId
-      if (this.login) {
-        localStorage.setItem("login", true)
-
+      top,
+      left,
+      transform: `rotate(${deg}deg)`
+    };
+  };
+  function Chip(height, width, value, style) {
+    const color = COLORS[CHIP_VALUES.indexOf(value)] || "black";
+    const text = DISPLAY_VALUES[value] || value;
+    return String.prototype.concat.call(
+      "<div className='chip' style='" + style + "'>",
+        "<svg height=" + height + " width=" + width + " viewBox='0 0 60 60'>",
+          "<circle opacity='.3' fill='#231F20' cx='30' cy='31' r='27.5' />",
+          "<circle fill=" + color +" cx='30' cy='30' r='26.5' />",
+          "<g fill='#FFF'>",
+            "<path d='M26.348 8h-8.877a22.019 22.019 0 00-7.774 9.637h4.17a20.236 20.236 0 00-2.623 11.082 21.962 21.962 0 017.368-11.082 21.878 21.878 0 016.079-3.456h-8.356A20.336 20.336 0 0126.348 8zM52 26.348v-8.88a22.007 22.007 0 00-9.64-7.772v4.167a20.221 20.221 0 00-11.079-2.618 21.931 21.931 0 0111.079 7.366 21.919 21.919 0 013.459 6.077l.001-8.354A20.365 20.365 0 0152 26.348zM33.652 52h8.877a22.03 22.03 0 007.774-9.637h-4.17a20.237 20.237 0 002.623-11.082 21.958 21.958 0 01-7.368 11.082 21.9 21.9 0 01-6.079 3.455h8.356A20.35 20.35 0 0133.652 52zM8 33.652v8.879a22.003 22.003 0 009.64 7.773v-4.168a20.21 20.21 0 0011.079 2.617 21.93 21.93 0 01-11.079-7.365 21.945 21.945 0 01-3.46-6.076v8.354A20.365 20.365 0 018 33.652z' />",
+          "</g>",
+          "<text fill='#FEFEFE' x='50%' y='50%' fontSize='15' fontWeight='500' textAnchor='middle' dy='.33em' style='text-anchor: middle;'>",
+            text,
+          "</text>",
+        "</svg>",
+      "<div>"
+    )
+  }
+  function check_win(number, b) {
+      let won = false;
+      if (number == 0) {
+          won = b.bet_type == 5 && b.number == 0;                   /* bet on 0 */
       } else {
-        localStorage.removeItem("login")
+      if (b.bet_type == 5) { 
+          won = b.number == number;                              /* bet on number */
+      } else if (b.bet_type == 4) {
+          if (b.number == 0) { won = number % 2 == 0; }              /* bet on even */
+          if (b.number == 1) { won = number % 2 == 1; }              /* bet on odd */
+      } else if (b.bet_type == 3) {            
+          if (b.number == 0) { won = number <= 18; }                /* bet on low 18s */
+          if (b.number == 1) { won = number >= 19; }                 /* bet on high 18s */
+      } else if (b.bet_type == 2) {                               
+          if (b.number == 0) { won = number <= 12; }                 /* bet on 1st dozen */
+          if (b.number == 1) { won = number > 12 && number <= 24; }  /* bet on 2nd dozen */
+          if (b.number == 2) { won = number > 24; }                  /* bet on 3rd dozen */
+      } else if (b.bet_type == 1) {               
+          if (b.number == 0) { won = number % 3 == 1; }              /* bet on left column */
+          if (b.number == 1) { won = number % 3 == 2; }              /* bet on middle column */
+          if (b.number == 2) { won = number % 3 == 0; }              /* bet on right column */
+      } else if (b.bet_type == 0) {
+          if (b.number == 0) {                                     /* bet on black */
+            if (number <= 10 || number >= 20 && number <= 28) {
+                won = number % 2 == 0;
+            } else {
+                won = number % 2 == 1;
+            }
+          } else {                                                 /* bet on red */
+            if (number <= 10 || number >= 20 && number <= 28) {
+                won = number % 2 == 1;
+            } else {
+                won = number % 2 == 0;
+            }
+          }
+      }
+      }
+      return won
+  }
+
+  export default {
+    data() {
+      return {
+        login: false,
+        accountId: '',
+        contract: {},
+        bets: [],
+        last_bets: [],
+        amount_select: 10,
+        balance_zeros: "000000",
+        balance_amount: 0,
+        balance: 0,
+        bet_zeros: "000000",
+        bet_amount: 0,
+        bet_val: 0,
+        deposit_text: 100,
+        withdraw_text: 100,
+        deposit_visible: false,
+        withdraw_visible: false,
+        spinning: false,
+        already_bet: false,
+        win_number: 0,
+        wheelSpinCounter: 0,
+        lastPosition: 0,
+        interval: {},
+        time_interval: {},
+        round_index: 0,
+        remain_time: 0,
+        next_round_block_index: 0,
+        current_block_index: 0,
+        waiting: false,
+        bet_disabled: false,
+        history_visible: false,
+        history_numbers: [],
+        history_bets: [],
+        current_type:'number',
+        round_status:{}
       }
     },
 
-    to_stake() {
-      this.$router.push('stake')
+    async mounted() {
+      this.contract = new Contract()
+      await this.contract.init()
+      
+      this.init()
+      await this.initLogin()
+      this.initBet()
+      this.update()
+      this.deal_href()
+      this.run()
+      // this.wait_for_spin()
     },
 
-    initBet() {
-      let str = localStorage.getItem("bets")
-      let amount_select = Number(localStorage.getItem("amount_select"))
-      if (amount_select) {
-        this.amount_select = amount_select
-      }
-      if (!str) {
-        return
-      }
-      let bets = str.split(",")
-      for (let i = 0; i < bets.length; i++) {
-        let bet_type = Number(bets[i].substring(0, 1))
-        let index = bets[i].indexOf("c")
-        let number = Number(bets[i].substring(1, index))
-        let node = document.getElementById("n" + bet_type + number)
-        let chips = Number(bets[i].substring(index + 1))
-        this.bet(number, bet_type, node, chips)
-      }
-      // this.bets = localStorage.getItem("bets") || []
-      // if (this.bets) {
-      //   console.log(this.bets)
-      //   for (let i = 0; i < this.bets.length; i++) {
-      //     let bet = this.bets[i]
-      //     bet.node = document.getElementById("n" + String(bet.bet_type) + String(bet.number))
-      //     this.updateBet(this.bets[i])
-      //   }
-      // }
+    async destroyed() {
+      clearInterval(this.interval)
+      clearInterval(this.time_interval)
     },
 
-    async wait_for_spin() {
-      let round_status = await this.contract.get_round_status()
-      this.win_number = round_status.win_number
-      this.round_index = round_status.round_index
-      this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
-      this.remain_time = this.remain_time < 0 ? 0:this.remain_time
-      this.animation(this.win_number, true)
-      this.history_numbers = round_status.history_numbers.reverse()
-      console.log(round_status)
+    methods: {
+      init() {
+        for (let i = 0; i <= 36; i ++) {
+          let div = document.getElementById('n5' + i)
+          div.onclick = () => { this.bet(i, 5, div) }
+        }
+        for (let i = 0; i <= 2; i ++) {
+          let div = document.getElementById('n2' + i)
+          div.onclick = () => { this.bet(i, 2, div) }
+        }
+        for (let i = 0; i <= 2; i ++) {
+          let div = document.getElementById('n1' + i)
+          div.onclick = () => { this.bet(i, 1, div) }
+        }
+        document.getElementById('n30').onclick = () => { this.bet(0, 3, document.getElementById('n30')) }
+        document.getElementById('n40').onclick = () => { this.bet(0, 4, document.getElementById('n40')) }
+        document.getElementById('n41').onclick = () => { this.bet(1, 4, document.getElementById('n41')) }
+        document.getElementById('n31').onclick = () => { this.bet(1, 3, document.getElementById('n31')) }
+        document.getElementById('n01').onclick = () => { this.bet(1, 0, document.getElementById('n01')) }
+        document.getElementById('n00').onclick = () => { this.bet(0, 0, document.getElementById('n00')) }
+      },
 
-      this.interval = setInterval(async () => {
+      async initLogin() {
+        let login = localStorage.getItem("login")
+        let accountId = await this.contract.is_signed_in()
+        this.login = login || accountId
+        if (this.login) {
+          localStorage.setItem("login", true)
+        } else {
+          localStorage.removeItem("login")
+        }
+      },
+
+      to_stake() {
+        this.$router.push('stake')
+      },
+
+      initBet() {
+        let str = localStorage.getItem("bets")
+        let amount_select = Number(localStorage.getItem("amount_select"))
+        if (amount_select) {
+          this.amount_select = amount_select
+        }
+        if (!str) {
+          return
+        }
+        let bets = str.split(",")
+        for (let i = 0; i < bets.length; i++) {
+          let bet_type = Number(bets[i].substring(0, 1))
+          let index = bets[i].indexOf("c")
+          let number = Number(bets[i].substring(1, index))
+          let node = document.getElementById("n" + bet_type + number)
+          let chips = Number(bets[i].substring(index + 1))
+          this.bet(number, bet_type, node, chips)
+        }
+  
+        // this.bets = localStorage.getItem("bets") || []
+        // if (this.bets) {
+        //   console.log(this.bets)
+        //   for (let i = 0; i < this.bets.length; i++) {
+        //     let bet = this.bets[i]
+        //     bet.node = document.getElementById("n" + String(bet.bet_type) + String(bet.number))
+        //     this.updateBet(this.bets[i])
+        //   }
+        // }
+      },
+
+
+      async handler(value) {
         if (this.waiting || this.spinning) {
           return
         }
-        this.waiting = true
-        let round_status = await this.contract.get_round_status()
-        if (round_status.round_index != this.round_index) {
-          this.win_number = round_status.win_number
-          this.round_index = round_status.round_index
-          this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
-          this.remain_time = this.remain_time < 0 ? 0:this.remain_time
-          this.history_numbers = round_status.history_numbers.reverse()
-          this.history_numbers
-          this.$refs.actions.disabled = false
-          this.$refs.board.disabled = false
-          this.spin_wheel()
-        }
-        this.waiting = false
-      }, 1000)
-
-      this.time_interval = setInterval(() => {
-        this.remain_time -= 1
+        // let roundStatus = await this.contract.get_round_status()
+        console.log(this.round_status.next_round_block_index , value.latestBlockHeight,'-------value-------');
+        this.remain_time = Math.ceil((this.round_status.next_round_block_index - value.latestBlockHeight) * value.recentBlockProductionSpeed)+3
         this.remain_time = this.remain_time < 0 ? 0:this.remain_time
-      }, 1000);
-    },
+        try {
+          if (this.round_status.next_round_block_index < Number(value.latestBlockHeight)) {
+            // if(!this.is_pre_animation && this.round_status.round_index==this.round_index){
+            //   this.animation(this.win_number, true,true)
+            // }
+            
+            this.round_status = await this.contract.get_round_status()
+            // let contractStatus = await this.contract.get_contract_status()
+            console.log(this.round_status.bet_count,'------contractStatus.bet_count-----');
+            if (this.round_status.round_index!=this.round_index) {
+              this.waiting = true
+              this.round_status.bet_count = 0
+              this.win_number = this.round_status.last_round_win_number
+              this.spin_wheel()
+              this.round_index = this.round_status.round_index
+              this.$refs.actions.disabled = false
+              this.$refs.board.disabled = false
+              this.waiting = false
 
-    deal_href() {
-      let hash = this.$route.query.transactionHashes
-      if (!hash) {
+            }
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      },
+
+      async run() {
+        this.round_status = await this.contract.get_round_status();
+        this.round_index = this.round_status.round_index
+        this.win_number = this.round_status.last_round_win_number
+        this.animation(this.win_number, true)
+        console.log(this.round_index,'-----this.round_index-----');
+        wampApi.subscribe("chain-blocks-stats", this.handler)
+      },
+
+      async wait_for_spin() {
+        let round_status = await this.contract.get_round_status()
+        console.log(round_status,'---round_status-----');
+        this.win_number = round_status.last_round_win_number
+        this.round_index = round_status.round_index
+        this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_round_block_index) * 0.6)
+        this.remain_time = this.remain_time < 0 ? 0:this.remain_time
+        this.animation(this.win_number, true)
+        // this.history_numbers = round_status.history_numbers.reverse()
+
+        this.interval = setInterval(async () => {
+          if (this.waiting || this.spinning) {
+            return
+          }
+          this.waiting = true
+          let round_status = await this.contract.get_round_status()
+          if (round_status.round_index != this.round_index) {
+            this.win_number = round_status.last_round_win_number
+            this.round_index = round_status.round_index
+            this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
+            this.remain_time = this.remain_time < 0 ? 0:this.remain_time
+            // this.history_numbers = round_status.history_numbers.reverse()
+            this.$refs.actions.disabled = false
+            this.$refs.board.disabled = false
+            this.spin_wheel()
+          }
+          this.waiting = false
+        }, 1000)
+
+        this.time_interval = setInterval(() => {
+          this.remain_time -= 1
+          this.remain_time = this.remain_time < 0 ? 0:this.remain_time
+        }, 1000);
+      },
+
+      deal_href() {
+        let hash = this.$route.query.transactionHashes
+        if (!hash) {
+          let index = location.href.indexOf("?")
+          if (index > -1) {
+            location.href = location.href.substring(0, index)
+          }
+          return false
+        } 
         let index = location.href.indexOf("?")
         if (index > -1) {
           location.href = location.href.substring(0, index)
         }
-        return false
-      } 
-      let index = location.href.indexOf("?")
-      if (index > -1) {
-        location.href = location.href.substring(0, index)
-      }
-      return true
-    },
+        return true
+      },
 
-    async update() {
-      if (this.login) {
-        let status = await this.contract.get_status()
-        console.log(status)
-        this.status = status
-        let balance_str = this.contract.from_yocto(status.user.balance + "00")
-        balance_str = balance_str.replace(/,/g, "");
-        this.editBalance(balance_str)
-        this.win_number = status.win_number
-        this.history_bets = status.user.history_bets.reverse()
-        for (let i = 0; i < this.history_bets.length; i ++) {
-          let round = this.history_bets[i]
-          round.bet_chips = 0
-          for (let j = 0; j < round.bets.length; j ++) {
-            round.bet_chips += Number(this.contract.from_yocto(round.bets[j].chips)) * 100
+      async update() {
+        if (this.login) {
+          let account_status = await this.contract.get_account_status()
+          // let contract_status = await this.contract.get_contract_status();
+          let round_status = await this.contract.get_round_status();
+          // console.log(account_status,contract_status)
+          // this.status = status
+          let balance_str = this.contract.from_yocto(account_status.balance + "00")
+          balance_str = balance_str.replace(/,/g, "");
+          this.editBalance(balance_str)
+          this.win_number = round_status.last_round_win_number
+          // this.history_bets = status.user.history_bets.reverse()
+          // for (let i = 0; i < this.history_bets.length; i ++) {
+          //   let round = this.history_bets[i]
+          //   round.bet_chips = 0
+          //   for (let j = 0; j < round.bets.length; j ++) {
+          //     round.bet_chips += Number(this.contract.from_yocto(round.bets[j].chips)) * 100
+          //   }
+          // }
+        }
+      },
+
+      sign_in() {
+        this.contract.sign_in()
+      },
+
+      sign_out() {
+        this.contract.sign_out()
+        this.editBalance(0)
+        this.login = false
+        localStorage.removeItem("login")
+      },
+
+      editBalance(balance) {
+        this.balance = Math.floor(Number(balance))
+        let i = 0
+        let original_balance = this.balance_amount
+        let now_balance = this.balance
+        if (now_balance < 0) {
+          now_balance = 0
+        }
+        let count = 10
+        let delta = Math.floor((now_balance - original_balance) / count)
+        if (delta < 1 && delta > -1) {
+          count = 1
+        }
+        let ani = () => {
+          i += 1
+          let amount = this.balance_amount + delta
+          this.balance_amount = amount < 0 ? 0:amount
+          if (i == count) {
+            this.balance_amount = now_balance
+          }
+          let zero_count = String(this.balance_amount).length
+          this.balance_zeros = ""
+          for (let i = 0; i < 8 - zero_count; i++) {
+            this.balance_zeros += "0"
+          }
+          if (i < count) {
+            setTimeout(ani, 50)
           }
         }
-      }
-    },
+        ani()
+      },
 
-    sign_in() {
-      this.contract.sign_in()
-    },
-
-    sign_out() {
-      this.contract.sign_out()
-      this.editBalance(0)
-      this.login = false
-      localStorage.removeItem("login")
-    },
-
-    editBalance(balance) {
-      this.balance = Math.floor(Number(balance))
-      let i = 0
-      let original_balance = this.balance_amount
-      let now_balance = this.balance
-      if (now_balance < 0) {
-        now_balance = 0
-      }
-      let count = 10
-      let delta = Math.floor((now_balance - original_balance) / count)
-      if (delta < 1 && delta > -1) {
-        count = 1
-      }
-      let ani = () => {
-        i += 1
-        let amount = this.balance_amount + delta
-        this.balance_amount = amount < 0 ? 0:amount
-        if (i == count) {
-          this.balance_amount = now_balance
+      editBet(balance) {
+        this.bet_val = Number(balance)
+        let original_balance = this.bet_amount
+        let now_balance = Number(balance)
+        let count = 10
+        let delta = Math.floor((now_balance - original_balance) / count)
+        if (delta < 1 && delta > -1) {
+          count = 1
         }
-        let zero_count = String(this.balance_amount).length
-        this.balance_zeros = ""
-        for (let i = 0; i < 8 - zero_count; i++) {
-          this.balance_zeros += "0"
+        let i = 0
+        let ani = () => {
+          i += 1
+          let amount = this.bet_amount + delta
+          this.bet_amount = amount < 0 ? 0:amount
+          if (i == count) {
+            this.bet_amount = now_balance
+          }
+          let zero_count = String(this.bet_amount).length
+          this.bet_zeros = ""
+          for (let i = 0; i < 8 - zero_count; i++) {
+            this.bet_zeros += "0"
+          }
+          if (i < count) {
+            setTimeout(ani, 50)
+          }
         }
-        if (i < count) {
-          setTimeout(ani, 50)
+        ani()
+      },
+
+      updateBet(bet) {
+        let css = createMutateStyle(0.5 - Math.random(), 0.5 - Math.random(), 0.5 - Math.random())
+        let style = "top: " + css.top + "; left: " + css.left + "; transform: " + css.transform
+        let node = document.createElement("div");
+        node.className = "placed-chips"
+        node.style = "position: absolute;width: 100%;height: 100%" + style
+        node.innerHTML = Chip(35, 35, bet.chips, style)
+        bet.child = node
+        bet.node.appendChild(node)
+      },
+
+      bet(number, bet_type, node, chips=this.amount_select) {
+        if (this.already_bet) {
+          return
         }
-      }
-      ani()
-    },
-
-    editBet(balance) {
-      this.bet_val = Number(balance)
-      let original_balance = this.bet_amount
-      let now_balance = Number(balance)
-      let count = 10
-      let delta = Math.floor((now_balance - original_balance) / count)
-      if (delta < 1 && delta > -1) {
-        count = 1
-      }
-      let i = 0
-      let ani = () => {
-        i += 1
-        let amount = this.bet_amount + delta
-        this.bet_amount = amount < 0 ? 0:amount
-        if (i == count) {
-          this.bet_amount = now_balance
+        let bet = {
+          bet_type: bet_type,
+          number: number,
+          chips: chips,
+          node: node
         }
-        let zero_count = String(this.bet_amount).length
-        this.bet_zeros = ""
-        for (let i = 0; i < 8 - zero_count; i++) {
-          this.bet_zeros += "0"
+        let bet_amount = this.bet_val + chips
+        this.updateBet(bet)
+        this.editBet(bet_amount)
+        this.editBalance(this.balance)
+        this.bets.push(bet)
+        let bet_save = []
+        for (let i = 0; i < this.bets.length; i++) {
+          bet_save.push(String(this.bets[i].bet_type) + String(this.bets[i].number) + "c" + String(this.bets[i].chips))
         }
-        if (i < count) {
-          setTimeout(ani, 50)
+        localStorage.setItem("bets", bet_save)
+      },
+
+      async bet_submit() {
+        if (!this.login) {
+          this.sign_in()
+          return
         }
-      }
-      ani()
-    },
-
-    updateBet(bet) {
-      let css = createMutateStyle(0.5 - Math.random(), 0.5 - Math.random(), 0.5 - Math.random())
-      let style = "top: " + css.top + "; left: " + css.left + "; transform: " + css.transform
-      let node = document.createElement("div");
-      node.className = "placed-chips"
-      node.style = "position: absolute;width: 100%;height: 100%" + style
-      node.innerHTML = Chip(35, 35, bet.chips, style)
-      bet.child = node
-      bet.node.appendChild(node)
-    },
-
-    bet(number, bet_type, node, chips=this.amount_select) {
-      if (this.already_bet) {
-        return
-      }
-      let bet = {
-        bet_type: bet_type,
-        number: number,
-        chips: chips,
-        node: node
-      }
-      let bet_amount = this.bet_val + chips
-      this.updateBet(bet)
-      this.editBet(bet_amount)
-      this.editBalance(this.balance)
-      this.bets.push(bet)
-      let bet_save = []
-      for (let i = 0; i < this.bets.length; i++) {
-        bet_save.push(String(this.bets[i].bet_type) + String(this.bets[i].number) + "c" + String(this.bets[i].chips))
-      }
-      localStorage.setItem("bets", bet_save)
-    },
-
-    async bet_submit() {
-      if (!this.login) {
-        this.sign_in()
-        return
-      }
-      if (this.already_bet) {
-        return
-      }
-      this.already_bet = true
-      this.$refs.actions.disabled = true
-      this.$refs.board.disabled = true
-      try {
-        await this.contract.bet(this.bets)
-        window.alert("Bet Success");
-      } catch {
-        this.$refs.actions.disabled = false
-        this.$refs.board.disabled = false
-        this.already_bet = false
-        window.alert("Transaction Expired");
-      }
-      this.update()
-    },
-
-    rebet() {
-      if (!this.login) {
-        this.sign_in()
-        return
-      }
-      for (let i = 0; i < this.last_bets.length; i++) {
-        let bet = this.last_bets[i]
-        this.bet(bet.number, bet.bet_type, bet.node, bet.chips)
-      }
-      this.bet_submit()
-    },
-
-    undo() {
-      if (this.already_bet) {
-        return
-      }
-      if (this.bets.length <= 0) {
-        return
-      }
-      let bet = this.bets[this.bets.length - 1]
-      bet.node.removeChild(bet.child)
-      this.editBet(this.bet_val - bet.chips)
-      this.editBalance(this.balance)
-      this.bets.splice(this.bets.length - 1, 1)
-      let bet_save = []
-      for (let i = 0; i < this.bets.length; i++) {
-        bet_save.push(String(this.bets[i].bet_type) + String(this.bets[i].number) + "c" + String(this.bets[i].chips))
-      }
-      localStorage.setItem("bets", bet_save)
-    },
-
-    clear() {
-      if (this.already_bet) {
-        return
-      }
-      for (let i = 0; i < this.bets.length; i++) {
-        let bet = this.bets[i]
-        bet.node.removeChild(bet.child)
-      }
-      this.bets = []
-      this.editBet(0)
-      this.editBalance(this.balance)
-      localStorage.removeItem("bets")
-    },
-
-    clear_spin() {
-      this.last_bets = []
-      Object.assign(this.last_bets, this.bets)
-      this.bets = []
-      localStorage.removeItem("bets")
-    },
-
-    clear_ui() {
-      for (let i = 0; i < this.last_bets.length; i++) {
-        let bet = this.last_bets[i]
-        bet.node.removeChild(bet.child)
-      }
-      this.editBet(0)
-    },
-
-    select_bet(amount) {
-      this.amount_select = amount
-      localStorage.setItem("amount_select", this.amount_select)
-    },
-
-    show_won(number) {
-      let won = []
-      won.push(document.getElementById("n5" + number))
-      // won.push(document.getElementById("n4" + (number % 2)))
-      // let str = ''
-      // if (number <= 18) {
-      //   str = "n30"
-      // } else if (number >= 19) {
-      //   str = "n31"
-      // }
-      // won.push(document.getElementById(str))
-      // if (number <= 12) {
-      //   str = "n20"
-      // } else if (number > 12 && number <= 24) {
-      //   str = "n21"
-      // } else if (number > 24) {
-      //   str = "n22"
-      // }
-      // won.push(document.getElementById(str))
-      // if (number % 3 == 1) {
-      //   str = "n10"
-      // } else if (number % 3 == 2) {
-      //   str = "n11"
-      // } else if (number % 3 == 0) {
-      //   str = "n12"
-      // }
-      // won.push(document.getElementById(str))
-      // if (number <= 10 || number >= 20 && number <= 28) {
-      //   if (number % 2 == 0) {
-      //     str = "n00"
-      //   } else if (number % 2 == 1) {
-      //     str = "n01"
-      //   }
-      // }
-      // won.push(document.getElementById(str))
-
-      for (let i = 0; i < this.last_bets.length; i ++) {
-        let bet = this.last_bets[i]
-        if (check_win(number, bet)) {
-          won.push(bet.node)
+        if (this.already_bet) {
+          return
         }
-      }
-
-      for (let i = 0; i < won.length; i++) {
-        let bet = won[i]
-        bet.style.backgroundColor = "orange"
-        setTimeout(() => {
-          bet.style.backgroundColor = ""
-        }, 3000)
-      }
-    },
-
-    async spin_wheel() {
-      if (this.spinning) {
-        return
-      }
-      this.spinning = true
-      this.clear_spin()
-      setTimeout(() => {
-        this.show_won(this.win_number)
-      }, 5000);
-      setTimeout(() => {
-        this.clear_ui()
+        this.already_bet = true
+        this.$refs.actions.disabled = true
+        this.$refs.board.disabled = true
+        try {
+          await this.contract.bet(this.bets,this.round_index)
+          window.alert("Bet Success");
+        } catch {
+          this.$refs.actions.disabled = false
+          this.$refs.board.disabled = false
+          this.already_bet = false
+          window.alert("Transaction Expired");
+        }
         this.update()
-        this.spinning = false
-        this.already_bet = false
-      }, 8000)
-      this.animation(this.win_number)
-      
-    },
+      },
 
-    async deposit(amount) {
-      if (!this.login) {
-        this.sign_in()
-        return
-      }
-      this.editBalance(amount)
-      await this.contract.deposit(amount)
-      this.update()
-    },
+      rebet() {
+        if (!this.login) {
+          this.sign_in()
+          return
+        }
+        for (let i = 0; i < this.last_bets.length; i++) {
+          let bet = this.last_bets[i]
+          this.bet(bet.number, bet.bet_type, bet.node, bet.chips)
+        }
+       
+        this.bet_submit()
+      },
 
-    async withdraw(amount) {
-      if (!this.login) {
-        this.sign_in()
-        return
-      }
-      this.editBalance(this.balance - amount)
-      await this.contract.withdraw(amount)
-      this.update()
-    },
+      undo() {
+        if (this.already_bet) {
+          return
+        }
+        if (this.bets.length <= 0) {
+          return
+        }
+        let bet = this.bets[this.bets.length - 1]
+        bet.node.removeChild(bet.child)
+        this.editBet(this.bet_val - bet.chips)
+        this.editBalance(this.balance)
+        this.bets.splice(this.bets.length - 1, 1)
+        let bet_save = []
+        for (let i = 0; i < this.bets.length; i++) {
+          bet_save.push(String(this.bets[i].bet_type) + String(this.bets[i].number) + "c" + String(this.bets[i].chips))
+        }
+        localStorage.setItem("bets", bet_save)
+      },
 
-    toggle_deposit() {
-      this.deposit_visible = !this.deposit_visible
-      if (this.deposit_visible) {
-        this.withdraw_visible = false
-      } else {
-        this.deposit(Number(this.deposit_text))
-      }
-    },
+      clear() {
+        if (this.already_bet) {
+          return
+        }
+        for (let i = 0; i < this.bets.length; i++) {
+          let bet = this.bets[i]
+          bet.node.removeChild(bet.child)
+        }
+        this.bets = []
+        this.editBet(0)
+        this.editBalance(this.balance)
+        localStorage.removeItem("bets")
+      },
 
-    toggle_withdraw() {
-      this.withdraw_visible = !this.withdraw_visible
-      if (this.withdraw_visible) {
-        this.withdraw_text = this.balance_amount
+      clear_spin() {
+        this.last_bets = []
+        Object.assign(this.last_bets, this.bets)
+        this.bets = []
+        localStorage.removeItem("bets")
+      },
+
+      clear_ui() {
+        for (let i = 0; i < this.last_bets.length; i++) {
+          let bet = this.last_bets[i]
+          bet.node.removeChild(bet.child)
+        }
+        this.editBet(0)
+      },
+
+      select_bet(amount) {
+        this.amount_select = amount
+        localStorage.setItem("amount_select", this.amount_select)
+      },
+
+      show_won(number) {
+        let won = []
+        won.push(document.getElementById("n5" + number))
+        // won.push(document.getElementById("n4" + (number % 2)))
+        // let str = ''
+        // if (number <= 18) {
+        //   str = "n30"
+        // } else if (number >= 19) {
+        //   str = "n31"
+        // }
+        // won.push(document.getElementById(str))
+        // if (number <= 12) {
+        //   str = "n20"
+        // } else if (number > 12 && number <= 24) {
+        //   str = "n21"
+        // } else if (number > 24) {
+        //   str = "n22"
+        // }
+        // won.push(document.getElementById(str))
+        // if (number % 3 == 1) {
+        //   str = "n10"
+        // } else if (number % 3 == 2) {
+        //   str = "n11"
+        // } else if (number % 3 == 0) {
+        //   str = "n12"
+        // }
+        // won.push(document.getElementById(str))
+        // if (number <= 10 || number >= 20 && number <= 28) {
+        //   if (number % 2 == 0) {
+        //     str = "n00"
+        //   } else if (number % 2 == 1) {
+        //     str = "n01"
+        //   }
+        // }
+        // won.push(document.getElementById(str))
+
+        for (let i = 0; i < this.last_bets.length; i ++) {
+          let bet = this.last_bets[i]
+          if (check_win(number, bet)) {
+            won.push(bet.node)
+          }
+        }
+
+        for (let i = 0; i < won.length; i++) {
+          let bet = won[i]
+          bet.style.backgroundColor = "orange"
+          setTimeout(() => {
+            bet.style.backgroundColor = ""
+          }, 3000)
+        }
+      },
+
+      async spin_wheel() {
+        if (this.spinning) {
+          return
+        }
+        this.spinning = true
+        this.clear_spin()
+        setTimeout(() => {
+          this.show_won(this.win_number)
+        }, 5000);
+        setTimeout(() => {
+          this.clear_ui()
+          this.update()
+          this.spinning = false
+          this.already_bet = false
+        }, 8000)
+        this.animation(this.win_number)
+        
+      },
+
+      async deposit(amount) {
+        if (!this.login) {
+          this.sign_in()
+          return
+        }
+        this.editBalance(amount)
+        await this.contract.deposit(amount)
+        this.update()
+      },
+
+      async withdraw(amount) {
+        if (!this.login) {
+          this.sign_in()
+          return
+        }
+        this.editBalance(this.balance - amount)
+        await this.contract.withdraw(amount)
+        this.update()
+      },
+
+      toggle_deposit() {
+        this.deposit_visible = !this.deposit_visible
+        console.log(this.deposit_visible,'-------');
+        if (this.deposit_visible) {
+          this.withdraw_visible = false
+        } else {
+          this.deposit(Number(this.deposit_text))
+        }
+      },
+
+      toggle_withdraw() {
+        this.withdraw_visible = !this.withdraw_visible
+        if (this.withdraw_visible) {
+          this.withdraw_text = this.balance_amount
+          this.deposit_visible = false
+        } else {
+          this.withdraw(Number(this.withdraw_text))
+        }
+      },
+
+      toggle_history() {
+        this.history_visible = !this.history_visible
+      },
+
+      clear_button() {
         this.deposit_visible = false
-      } else {
-        this.withdraw(Number(this.withdraw_text))
+        this.withdraw_visible = false
+      },
+
+      animation(oneRandomNumber, init=false) {
+        /* listening for events from the smart contract */
+        this.wheelSpinCounter += 1;
+        /* get wheel element */
+        var wheel = document.getElementById("ball");
+        /* reset wheel */
+        // wheel.style.transformOrigin = "190px 190px"
+        // wheel.style.transitionDuration = "10s"
+        // wheel.style.transform = "rotate(" + this.lastPosition + "deg)";
+        
+        /* numbers in the wheel, ordered clockwise */
+        var numbers = [
+          0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27,
+          13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1,
+          20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+        ];
+        /* calculate how much do we need to rotate to have the random number chosen */
+        var numberDegree = numbers.indexOf(oneRandomNumber) * 360 / numbers.length;
+        /* add some rounds before to look like it's spinning */
+        var numRoundsBefore = 3 * this.wheelSpinCounter;
+        /* calculate total degrees we need to rotate */
+        var totalDegrees = (numRoundsBefore * 360) + numberDegree;
+        /* rotate the wheel */
+        if (init) {
+          wheel.style.transitionDuration = "0s"
+        } else {
+          wheel.style.transitionDuration = "5s"
+        }
+        
+        wheel.style.transform = "rotate(" + totalDegrees + "deg)";
+        
+        /* save position to be able to reset the wheel next time */
+        this.lastPosition = numberDegree;
+        /* show status on bets after wheel stops */
       }
+
     },
-
-    toggle_history() {
-      this.history_visible = !this.history_visible
-    },
-
-    clear_button() {
-      this.deposit_visible = false
-      this.withdraw_visible = false
-    },
-
-    animation(oneRandomNumber, init=false) {
-      /* listening for events from the smart contract */
-      this.wheelSpinCounter += 1;
-      /* get wheel element */
-      var wheel = document.getElementById("ball");
-      /* reset wheel */
-      // wheel.style.transformOrigin = "190px 190px"
-      // wheel.style.transitionDuration = "10s"
-      // wheel.style.transform = "rotate(" + this.lastPosition + "deg)";
-      
-      /* numbers in the wheel, ordered clockwise */
-      var numbers = [
-        0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27,
-        13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1,
-        20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
-      ];
-      /* calculate how much do we need to rotate to have the random number chosen */
-      var numberDegree = numbers.indexOf(oneRandomNumber) * 360 / numbers.length;
-      /* add some rounds before to look like it's spinning */
-      var numRoundsBefore = 3 * this.wheelSpinCounter;
-      /* calculate total degrees we need to rotate */
-      var totalDegrees = (numRoundsBefore * 360) + numberDegree;
-      /* rotate the wheel */
-      if (init) {
-        wheel.style.transitionDuration = "0s"
-      } else {
-        wheel.style.transitionDuration = "5s"
-      }
-      
-      wheel.style.transform = "rotate(" + totalDegrees + "deg)";
-      
-      /* save position to be able to reset the wheel next time */
-      this.lastPosition = numberDegree;
-      /* show status on bets after wheel stops */
-    }
-
-  },
-}
+  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.index {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: 100vh;
-  height: 100%;
-  place-items: center;
-}
-
-.background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background-color: green;
-  z-index: -1;
-}
-
-.header {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 98%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.index-wrapper {
-  width: 100%;
-  height: 100%;
-  max-height: 30vh;
-  max-width: 1200px;
-}
-
-.line {
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.wheel {
-  position: relative;
-  width: 330px;
-  height: 330px;
-  max-width: 330px;
-  max-height: 330px;
-}
-
-.place-bet {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-content: center;
-  justify-content: center;
-}
-
-.wheel-base {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-content: center;
-  justify-content: center;
-}
-
-.wheel text {
-    text-anchor: middle;
-    font-size: 19px;
-    fill: hsla(0,0%,100%,.9);
-    font-weight: 500;
-}
-
-.board-wrap {
-    border: 0px solid #fff !important;
-    font-size: 20px;
-}
-
-.board-wrap>div {
-    cursor: pointer!important;
-}
-
-.board {
-  width: 97vw;
-  max-width: 750px;
-  height: 34.64286vw;
-  max-height: 267.85714px;
-  display: grid;
-  grid-area: board1;
-  grid-template-columns: repeat(14,1fr);
-  grid-template-areas:
-      "n50 n53 n56 n59 n512 n515 n518 n521 n524 n527 n530 n533 n536 n12"
-      "n50 n52 n55 n58 n511 n514 n517 n520 n523 n526 n529 n532 n535 n11"
-      "n50 n51 n54 n57 n510 n513 n516 n519 n522 n525 n528 n531 n534 n10"
-      ". n20 n20 n20 n20 n21 n21 n21 n21 n22 n22 n22 n22 ."
-      ". n30 n30 n40 n40 n01 n01 n00 n00 n41 n41 n31 n31 .";
-  color: white;
-}
-
-.board>div {
-    display: grid;
-    position: relative;
-    place-items: center;
-    text-transform: uppercase;
-    border-top: 1px solid #fff;
-    border-right: 1px solid #fff;
-    z-index: 100;
-}
-
-.board>#n50, .board>#n30, .board>#n20 {
-    border-left: 1px solid #fff;
-}
-.board>#n00, .board>#n40, .board>#n31, .board>#n50, .board>#n41, .board>#n01, .board>#n30, .board>#n10 {
-    border-bottom: 1px solid #fff;
-}
-
-#n51, #n54, #n57, #n510, #n513, #n516, #n519, #n522, #n525, #n528, #n531, #n534 {
-    box-shadow: 0 4px 0 rgb(0 0 0 / 20%);
-}
-
-.board .red {
-    background-color: #ec0230;
-}
-
-.board .black {
-    background-color: #2b2627;
-}
-
-.board #n01 polygon {
-    fill: #ec0230;
-    stroke: #fff;
-}
-
-.bet-select {
-    grid-area: chips;
-    margin: 9px;
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(10,minmax(auto,68px));
-    grid-column-gap: 4px;
-    -webkit-justify-content: center;
+  .index {
+    display: flex;
     justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    height: 100%;
     place-items: center;
-}
+    background-color: green;
+  }
 
-.bet-option.active {
-    -webkit-transform: translateY(-10px);
-    transform: translateY(-10px);
-}
+  .header {
+    position: fixed;
+    right: 40px;
+    top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-.bet-option {
-    transition: all .3s;
-}
+  .header .logo{
+    width:50px;
+  }
 
-.bet-option, .chip {
+  .header .nav{
+    display: flex;
+  }
+  .nav-item{
+    margin-left:20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size:14px;
+    color:#FFF;
+    font-weight:bold;
+    cursor:pointer;
+  }
+
+  .index-wrapper {
     width: 100%;
-}
+    height: 100%;
+    max-width: 1200px;
+  }
 
-.bet-select .chip {
-    cursor: pointer;
-}
-
-.bet-option, .chip {
+  .line {
     width: 100%;
-}
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-.info {
-  display: flex;
-  justify-content: space-between;
-  color: white;
-  width: 330px;
-}
+  .wheel {
+    position: relative;
+    width: 330px;
+    height: 330px;
+    max-width: 330px;
+    max-height: 330px;
+  }
 
-.info>div {
+  .place-bet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+  }
+
+  .wheel-base {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+  }
+
+  .wheel text {
+      text-anchor: middle;
+      font-size: 19px;
+      fill: hsla(0,0%,100%,.9);
+      font-weight: 500;
+  }
+
+  .board-wrap {
+      border: 0px solid #fff !important;
+      font-size: 20px;
+  }
+
+  .board-wrap>div {
+      cursor: pointer!important;
+  }
+
+  .board {
+    width: 97vw;
+    max-width: 750px;
+    height: 34.64286vw;
+    max-height: 267.85714px;
+    display: grid;
+    grid-area: board1;
+    grid-template-columns: repeat(14,1fr);
+    grid-template-areas:
+        "n50 n53 n56 n59 n512 n515 n518 n521 n524 n527 n530 n533 n536 n12"
+        "n50 n52 n55 n58 n511 n514 n517 n520 n523 n526 n529 n532 n535 n11"
+        "n50 n51 n54 n57 n510 n513 n516 n519 n522 n525 n528 n531 n534 n10"
+        ". n20 n20 n20 n20 n21 n21 n21 n21 n22 n22 n22 n22 ."
+        ". n30 n30 n40 n40 n01 n01 n00 n00 n41 n41 n31 n31 .";
+    color: white;
+  }
+
+  .board>div {
+      display: grid;
+      position: relative;
+      place-items: center;
+      text-transform: uppercase;
+      border-top: 1px solid #fff;
+      border-right: 1px solid #fff;
+      z-index: 100;
+      font-size:18px;
+      font-weight:bold;
+  }
+
+  .board>#n50, .board>#n30, .board>#n20 {
+      border-left: 1px solid #fff;
+  }
+  .board>#n00, .board>#n40, .board>#n31, .board>#n50, .board>#n41, .board>#n01, .board>#n30, .board>#n10 {
+      border-bottom: 1px solid #fff;
+  }
+
+  #n51, #n54, #n57, #n510, #n513, #n516, #n519, #n522, #n525, #n528, #n531, #n534 {
+      box-shadow: 0 4px 0 rgb(0 0 0 / 20%);
+  }
+
+  .board .red {
+      background-color: #ec0230;
+  }
+
+  .board .black {
+      background-color: #2b2627;
+  }
+
+  .board #n01 polygon {
+      fill: #ec0230;
+      stroke: #fff;
+  }
+
+  .bet-select {
+      grid-area: chips;
+      margin: 9px;
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(10,minmax(auto,68px));
+      grid-column-gap: 4px;
+      -webkit-justify-content: center;
+      justify-content: center;
+      place-items: center;
+  }
+
+  .bet-option.active {
+      -webkit-transform: translateY(-10px);
+      transform: translateY(-10px);
+  }
+
+  .bet-option {
+      transition: all .3s;
+  }
+
+  .bet-option, .chip {
+      width: 100%;
+  }
+
+  .bet-select .chip {
+      cursor: pointer;
+  }
+
+  .bet-option, .chip {
+      width: 100%;
+  }
+
+  .info {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    width: 330px;
+  }
+
+  .info>div {
     min-width: 75px;
-}
+    font-size:16px;
+  }
 
-.info .padded {
+  .info .padded {
     opacity: .12;
-}
+  }
 
-p {
+  p {
     margin: 0;
     padding: 0;
     font-weight: 500;
     font-size: 20px;
-}
+  }
 
-.actions {
-    grid-area: actions;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    -webkit-justify-content: center;
+  .actions {
+      width:750px;
+      display: flex;
+      margin:0;
+      padding:0;
+      justify-content: center;
+  }
+
+  .actions button {
+      opacity: 1;
+      transition: opacity .15s;
+      outline: none;
+      outline-offset: 0;
+      font-size: 16px;
+      border:1px solid #FFF;
+      width:100px;
+      margin-left:20px;
+      border-radius:5px;
+  }
+
+  button {
+      font-family: "Oswald",sans-serif;
+      border: none;
+      outline: 1px solid #fff;
+      outline-offset: -6px;
+      padding: 10px 21px;
+      margin: 0;
+      text-decoration: none;
+      text-transform: uppercase;
+      background: transparent;
+      color: #fff;
+      font-weight: 500;
+      font-size: 24px;
+      cursor: pointer;
+      text-align: center;
+      transition: background .25s ease-in-out,-webkit-transform .15s ease;
+      transition: background .25s ease-in-out,transform .15s ease;
+      transition: background .25s ease-in-out,transform .15s ease,-webkit-transform .15s ease;
+  }
+
+  button svg {
+      fill: #fff;
+  }
+
+  button.spin {
+      outline: none;
+      padding: 0;
+      font-weight: 500;
+      width: 60%;
+      font-size: 18px;
+  }
+
+  .board-wrap>div>div:hover{
+    background-color:orange
+  }
+
+  button:hover {
+    background: rgba(0,0,0,0.2)
+  }
+
+  .round {
+    border-radius: 50%;
+  }
+
+  .placed-chips {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+  }
+
+  .placed-chips .chip {
+      position: relative;
+      width: 5.5vw;
+      max-width: 30px;
+      height: 5.5vw;
+      max-height: 30px;
+  }
+
+  .chip text {
+      text-anchor: middle;
+      font-size: 19px;
+      fill: hsla(0,0%,100%,.9);
+      font-weight: 500;
+  }
+
+  .wallet-wrapper {
+    display: flex;
     justify-content: center;
-    place-items: center;
-}
+    align-items: center;
+    width: 100%;
+    margin-top: 90px;
+  }
 
-.actions button {
-    opacity: 1;
-    transition: opacity .15s;
-}
+  .wallet-unit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-button {
-    font-family: "Oswald",sans-serif;
+  .mask-content {
+    width: 300px;
     border: none;
     outline: 1px solid #fff;
-    outline-offset: -6px;
-    padding: 10px 21px;
+    padding: 30px;
     margin: 0;
     text-decoration: none;
     text-transform: uppercase;
-    background: transparent;
-    color: #fff;
-    font-weight: 500;
-    font-size: 24px;
+    background: #FFF;
+    border-radius:10px;
+  }
+
+  .mask-content input {
+      outline-color: invert;
+      outline-style: none;
+      outline-width: 0px;
+      border: 1px solid #333;
+      padding:0 10px;
+      text-shadow: none;
+      -webkit-appearance: none;
+      outline-color: transparent;
+      box-shadow: none;
+      background-color: transparent;
+      text-align: right;
+      width: 100%;
+      height:36px;
+      line-height:36px;
+      font-family: "Oswald",sans-serif;
+      color: #333;
+      font-weight: 500;
+      font-size: 16px;
+      box-sizing:border-box;
+      border-radius:5px;
+  }
+
+  .mask-content-withdraw .tip{
+    font-size:12px;
+    text-align:right;
+    margin-top:10px;
+    color:#999;
+  }
+
+  .mask-content .button-box{
+    display:flex;
+    margin-top:30px;
+    justify-content: right;
+    
+  }
+
+  .mask-content .button{
+    margin-left:20px;
+    font-size:14px;
+    color:#333;
+    font-weight:bold;
     cursor: pointer;
-    text-align: center;
-    transition: background .25s ease-in-out,-webkit-transform .15s ease;
-    transition: background .25s ease-in-out,transform .15s ease;
-    transition: background .25s ease-in-out,transform .15s ease,-webkit-transform .15s ease;
-}
+  }
 
-button svg {
-    fill: #fff;
-}
-
-button.spin {
-    outline: none;
-    padding: 0;
-    font-weight: 500;
-    width: 60%;
-    font-size: 18px;
-}
-
-.board-wrap>div>div:hover{
-  background-color:orange
-}
-
-button:hover {
-  background: rgba(0,0,0,0.2)
-}
-
-.round {
-  border-radius: 50%;
-}
-
-.placed-chips {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.placed-chips .chip {
+  .mask-content-history{
+    width:400px;
     position: relative;
-    width: 5.5vw;
-    max-width: 30px;
-    height: 5.5vw;
-    max-height: 30px;
-}
+  }
 
-.chip text {
-    text-anchor: middle;
-    font-size: 19px;
-    fill: hsla(0,0%,100%,.9);
-    font-weight: 500;
-}
+  .mask-content-history .close-btn{
+    position: absolute;
+    top:10px;
+    right:10px;
+    cursor: pointer;
+  }
 
-.wallet-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin-top: 90px;
-}
+  .mask-content-history .list{
+    height:600px;
+    overflow-y:scroll;
+  }
 
-.wallet-unit {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+  .mask-content-history .tap-box{
+    display:flex;
+    justify-content:center;
+  }
+  .mask-content-history .tap-box>div{
+    margin:0 20px;
+    font-size:16px;
+    font-weight:bold;
+    position:relative;
+    cursor:pointer;
+    padding-bottom:10px;
+  }
+  .mask-content-history .tap-box .active:after{
+    display:block;
+    content:"";
+    width:30px;
+    height:3px;
+    border-radius:3px;
+    background-color:red;
+    position:absolute;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+  }
 
-.input-wrapper {
-  width: 200px;
-  
-  border: none;
-  outline: 1px solid #fff;
-  padding: 3px 21px;
-  margin: 0;
-  text-decoration: none;
-  text-transform: uppercase;
-  background: rgba(0,0,0,0.2);
-  cursor: pointer;
-  
-  transition: background .25s ease-in-out,transform .15s ease;
-}
+  .mask-content-history div{
+    color:#333;
+    font-size:14px;
+  }
 
-.input-wrapper input {
-    outline-color: invert;
-    outline-style: none;
-    outline-width: 0px;
-    border: none;
-    border-style: none;
-    text-shadow: none;
-    -webkit-appearance: none;
-    outline-color: transparent;
-    box-shadow: none;
-    background-color: transparent;
-    text-align: right;
+  .spin-ani {
+    animation: spin 5s infinite normal linear;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .ball-ani {
+    animation: ball 1s infinite normal linear;
+  }
+
+  @keyframes ball {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .history-wrapper {
     width: 100%;
-    font-family: "Oswald",sans-serif;
-    font-weight: 400;
-    line-height: 11px;
+    border-radius: 20px;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    border: 1px solid #fff;
+    margin-top: 20px;
+    align-items: center;
+  }
+
+  .history {
     color: #fff;
     font-weight: 500;
     font-size: 24px;
-}
-
-.spin-ani {
-  animation: spin 5s infinite normal linear;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
   }
-  50% {
-    transform: rotate(180deg);
+
+  [disabled] button, button[disabled] {
+    box-shadow: none;
+    background-color: var(--light-gray);
+    color: gray;
+    cursor: not-allowed;
+    transform: none;
   }
-  100% {
-    transform: rotate(360deg);
+
+  [disabled] .loader-content {
+    text-indent: -900em;
+    width: 2em;
+    position: relative;
   }
-}
-
-.ball-ani {
-  animation: ball 1s infinite normal linear;
-}
-
-@keyframes ball {
-  0% {
-    transform: rotate(0deg);
+  [disabled] .loader-content:after {
+    content: " ";
+    display: block;
+    width: 0.8em;
+    height: 0.8em;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    border-color: var(--fg) transparent var(--fg) transparent;
+    animation: loader 1.2s linear infinite;
+    position: absolute;
+    top: 0.45em;
+    right: 0.5em;
   }
-  50% {
-    transform: rotate(180deg);
+
+  @keyframes loader {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(360deg) }
   }
-  100% {
-    transform: rotate(360deg);
+
+  fieldset {
+    border: none;
   }
-}
 
-.history-wrapper {
-  width: 100%;
-  border-radius: 20px;
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  border: 1px solid #fff;
-  margin-top: 20px;
-  align-items: center;
-}
+</style>
 
-.history {
-  color: #fff;
-  font-weight: 500;
-  font-size: 24px;
-}
+<style >
+  .menu{
+    position:fixed;
+    right:40px;
+    bottom:40px;
+  }
+  .menu-item{
+    width:120px;
+    height:46px;
+    border-radius:10px;
+    background:#FFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size:12px;
+    font-weight:bold;
+    margin-top:20px;
+    cursor:pointer;
+  }
 
-[disabled] button, button[disabled] {
-  box-shadow: none;
-  background-color: var(--light-gray);
-  color: gray;
-  cursor: not-allowed;
-  transform: none;
-}
 
-[disabled] .loader-content {
-  text-indent: -900em;
-  width: 2em;
-  position: relative;
-}
-[disabled] .loader-content:after {
-  content: " ";
-  display: block;
-  width: 0.8em;
-  height: 0.8em;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  border-color: var(--fg) transparent var(--fg) transparent;
-  animation: loader 1.2s linear infinite;
-  position: absolute;
-  top: 0.45em;
-  right: 0.5em;
-}
-
-@keyframes loader {
-  0% { transform: rotate(0deg) }
-  100% { transform: rotate(360deg) }
-}
-
-fieldset {
-  border: none;
-}
-
+  .mask{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:999;
+    background:rgba(0,0,0,0.7);
+    display:flex;
+    justify-content:center;
+    align-items: center;
+  }
+  
 </style>

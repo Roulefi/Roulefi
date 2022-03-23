@@ -10,7 +10,7 @@ export default class Contract {
   near
   wallet_connection
   contract
-  status
+  account_status
   provider
 
   async init() {
@@ -28,7 +28,7 @@ export default class Contract {
     // Initializing our contract APIs by contract name and configuration.
     this.contract = await new nearAPI.Contract(this.wallet_connection.account(), nearConfig.contractName, {
         // View methods are read-only – they don't modify the state, but usually return some value
-        viewMethods: ['get_status', 'get_round_status'],
+        viewMethods: ['get_account_status', 'get_round_status','get_contract_status'],
         // Change methods can modify the state, but you don't receive the returned value when called
         changeMethods: ['bet', 'spin_wheel', 'deposit', 'withdraw', 'stake', 'unstake', 'harvest'],
         // Sender is the account ID to initialize transactions.
@@ -54,10 +54,17 @@ export default class Contract {
     return await this.wallet_connection.getAccountId()
   }
 
-  async get_status() {
+  async get_account_status() {
     let accountId = await this.get_account()
-    this.status = await this.contract.get_status({sender: accountId})
-    return this.status
+    this.account_status = await this.contract.get_account_status({account_id: accountId})
+    console.log(this.account_status,'----this.account_status----');
+    return this.account_status
+  }
+
+  async get_contract_status() {
+    const contract_status = await this.contract.get_contract_status()
+    console.log(contract_status,'----this.contract_status----');
+    return contract_status
   }
 
   async get_round_status() {
@@ -71,7 +78,7 @@ export default class Contract {
   }
 
   async withdraw(amount) {
-    if (Number(this.from_yocto(this.status.user.balance)) * 100 < amount) {
+    if (Number(this.from_yocto(this.account_status.balance)) * 100 < amount) {
       return
     }
     await this.contract.withdraw({amount: amount + BET_AMOUNT});
@@ -91,7 +98,7 @@ export default class Contract {
     await this.contract.harvest({index: index})
   }
 
-  async bet(bets) {
+  async bet(bets,round_index) {
     let bets_format = []
     let amount = 0
     for (let i = 0; i < bets.length; i++) {
@@ -104,14 +111,15 @@ export default class Contract {
 
       bets_format.push(bet)
     }
-    amount += 0.01
+    // amount += 0.01
     
-    let balance = Number(this.from_yocto(this.status.user.balance))
+    let balance = Number(this.from_yocto(this.account_status.balance))
+    console.log(round_index,'------round_index------');
     if (balance < amount) {
       let pay = String(parseInt((amount - balance) * 100)) + BET_AMOUNT
-      await this.contract.bet({bets: bets_format}, GAS, pay)
+      await this.contract.bet({bets: bets_format,round_index}, GAS, pay)
     } else {
-      await this.contract.bet({bets: bets_format}, GAS)
+      await this.contract.bet({bets: bets_format,round_index}, GAS)
     }
   }
 
