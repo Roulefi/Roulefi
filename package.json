@@ -29,6 +29,7 @@
     "regenerator-runtime": "^0.13.5",
     "vue": "^2.6.11",
     "vue-router": "^3.5.2",
+    "vue2-toast": "^2.1.0",
     "yarn": "^1.22.11"
   },
   "devDependencies": {
