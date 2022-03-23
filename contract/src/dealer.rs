@@ -28,7 +28,7 @@ impl Contract {
             loss: 0
         });
         self.accounts.insert(&sender_id, &account);
-        self.round_status.max_amount_allowed = (U256::from(self.round_status.stake_amount + self.round_status.profit_amount) * U256::from(self.config.amount_allowed_rate as u128)).as_u128();   //re-calculate max amount for bets
+        self.cal_max_amount_allowed();
     }
 
     /*
@@ -54,7 +54,7 @@ impl Contract {
             self.stake_accounts.remove(&sender_id);
         }
         self.accounts.insert(&sender_id, &account);
-        self.round_status.max_amount_allowed = (U256::from(self.round_status.stake_amount + self.round_status.profit_amount) * U256::from(self.config.amount_allowed_rate as u128)).as_u128();   //re-calculate max amount for bets
+        self.cal_max_amount_allowed();
         Promise::new(sender_id).transfer(amount.clone());
     }
 

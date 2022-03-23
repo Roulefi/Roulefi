@@ -67,7 +67,6 @@ pub struct Contract {
     
 }
 
-#[near_bindgen]
 #[derive(PanicOnDefault, BorshDeserialize, BorshSerialize)]
 pub struct Config {
     treasury_threshold: u128,   // treasury amount threshold
@@ -76,7 +75,7 @@ pub struct Config {
     step_time: Vec<u64>,        // a user's share in the pool will rise after each step_time
     step_rate: Vec<u32>,        // the share multiplier for each step_time
     treasury_rate: u32,         // the percentage for every round profit in the pool
-    amount_allowed_rate: f32,   // max_amount_allowed = (stake_amount + profit_amount) * amount_allowed_rate
+    amount_allowed_rate: u32,   // max_amount_allowed = (stake_amount + profit_amount) * amount_allowed_rate
     gas_per_player: u128,
     round_delta: u64
 }
@@ -134,9 +133,9 @@ impl Contract {
     pub fn new() -> Self {
         assert!(env::state_read::<Self>().is_none(), "Already initialized");
         let this = Self {
-            owner_id: "bhc.testnet".to_string(),
+            owner_id: env::predecessor_account_id(),
             config: Config {
-                amount_allowed_rate: 0.1,
+                amount_allowed_rate: 10,
                 min_lock_time: 0,                       // now it is not working
                 step_time: vec![0, 604800, 2592000],    // one week , one month
                 step_rate: vec![0, 5, 20],        // 5%, 20%
@@ -149,9 +148,9 @@ impl Contract {
             round_status: RoundStatus {
                 round_index: 0,
                 current_round_block_index: env::block_index(),
-                next_round_block_index: 0,                 //self.round_delta + env::block_index(),
+                next_round_block_index: 0,             
                 last_round_win_number: 0,
-                max_amount_allowed: 0, ////(env::account_balance() as f64 * 0.1) as u128, 
+                max_amount_allowed: 0, 
                 bet_amount: 0,
                 stake_amount: 0,
                 profit_amount: 0,

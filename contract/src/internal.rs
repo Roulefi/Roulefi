@@ -1,6 +1,10 @@
 use crate::*;
 
 impl Contract {
+    pub(crate) fn cal_max_amount_allowed(&mut self) {
+        self.round_status.max_amount_allowed = (U256::from(self.round_status.stake_amount + self.round_status.profit_amount - self.round_status.loss_amount) * U256::from(self.config.amount_allowed_rate as u128) / U256::from(100 as u128)).as_u128();   //re-calculate max amount for bets
+    }
+
     pub(crate) fn cal_share(&self, stake: Stake) -> (U256, U256) {
         let now = env::block_timestamp();
         let time_delta = now - u64::from(stake.time);
@@ -61,7 +65,7 @@ impl Contract {
             }
             self.accounts.insert(&account_id, &account);
         }
-        self.round_status.max_amount_allowed = (U256::from(self.round_status.stake_amount + self.round_status.profit_amount) * U256::from(self.config.amount_allowed_rate as u128)).as_u128();   //re-calculate max amount for bets
+        self.cal_max_amount_allowed();
     
     }
 }

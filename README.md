@@ -1,7 +1,7 @@
-# NEAR-Roulette
+# Roulefi
 > A Near smart contract roulette. 
 > 
-**NEAR-Roulette** is a regular roulette on Near testnet. You can bet in the game directly or stake your near into the pool then bet passively with gamers.
+**Roulefi** is a regular roulette on Near testnet. You can bet in the game directly or stake your near into the pool then bet passively with gamers.
     
 # Roulette
 Choose which you want to bet and then submit your bet and transfer some money to the contract, wait for countdown to spin automatically. Each round has 60 blocks to wait, which is approximately 36 seconds. 
