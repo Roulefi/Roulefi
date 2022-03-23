@@ -806,12 +806,14 @@
         this.$refs.board.disabled = true
         try {
           await this.contract.bet(this.bets,this.round_index)
-          window.alert("Bet Success");
+          this.$toast.top('Bet Success');
+          // window.alert("Bet Success");
         } catch {
           this.$refs.actions.disabled = false
           this.$refs.board.disabled = false
           this.already_bet = false
-          window.alert("Transaction Expired");
+          this.$toast.top('Transaction Expired');
+          // window.alert("Transaction Expired");
         }
         this.update()
       },

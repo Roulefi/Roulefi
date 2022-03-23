@@ -24,10 +24,12 @@
               </div>
             </div>
             <div class="wallet-unit" @click.stop>
+              <!--
               <div class="input-wrapper" v-if="unstake_visible[i]">
                 <input v-model="unstake_text"/>
               </div>
-              <div class="button" @click="toggle_unstake(i)">UNSTAKE</div>
+              -->
+              <div class="button" @click="show_unstake(item,i)">UNSTAKE</div>
             </div>
             <!--
             <div style="margin-right: 30px">
@@ -55,6 +57,17 @@
       <div class="line">
       </div>
     </div>
+
+    <!--mask-->
+    <div class="mask" @click.stop v-if="unstake_visible">
+      <div class="mask-content">
+        <div>Are you sure you want to unstake?</div>
+        <div class="button-box">
+          <div class="button" @click="unstake_visible=false">cancel</div>
+          <div class="button" @click="unstake()">confirm</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -75,8 +88,10 @@ export default {
       stake_visible: false,
       my_stake_amount: 0,
       stake_text: '',
-      unstake_visible: [],
+      unstake_visible: false,
       unstake_text: '',
+      item:{},
+      current_index:0,
     }
   },
 
@@ -128,11 +143,11 @@ export default {
         this.stake_amount = this.contract.from_yocto(contract_status.stake_amount).replace(/,/g, "")
         this.stakes = account_status.stakes
         let total = 0
-        this.unstake_visible = []
+        // this.unstake_visible = []
         for (let i = 0; i < this.stakes.length; i ++) {
           let stake = this.stakes[i]
           total += Number(this.contract.from_yocto(stake.amount).replace(/,/g, ""))
-          this.unstake_visible.push(false)
+          // this.unstake_visible.push(false)
           console.log(total)
         }
         this.my_stake_amount = total
@@ -168,41 +183,55 @@ export default {
       }
     },
 
-    async unstake(amount, index) {
+    async unstake() {
+      const item = this.current_item;
+      const index = this.current_index;
       if (!this.login) {
         this.sign_in()
         return
       }
       try {
-        await this.contract.unstake(amount, index)
-        this.unstake_text = "";
-        window.alert("Unstake Success")
+        const amount = Number(Number(this.contract.from_yocto(item.amount).replace(/,/g, "")).toFixed(2)) + Number(Number(this.contract.from_yocto(item.profit).replace(/,/g, "")).toFixed(2));
+        console.log(amount,'-------amount--------');
+        this.unstake_visible = false;
+        await this.contract.unstake(String(amount), index)
+        // this.unstake_text = "";
+        this.$toast.top("Unstake Success");
+        // window.alert("Unstake Success")
       } catch {
-        window.alert("Transaction Expired")
+        this.$toast.top("Transaction Expired");
+        // window.alert("Transaction Expired")
       }
       
       this.update()
     },
-
-    async toggle_unstake(index) {
-      for(let i=0;i<this.unstake_visible.length;i++){
-        if(i!=index){
-           this.unstake_visible[i] = false;
-        }
-      }
-      this.unstake_visible[index] = !this.unstake_visible[index]
-      if (this.unstake_visible[index] && this.unstake_text!=0) {
-        await this.unstake(this.unstake_text, index)
-      }
-      this.$forceUpdate()
+    
+    show_unstake(item,i){
+      this.current_item = item;
+      this.current_index = i;
+      this.unstake_visible = true;
     },
+
+
+
+    // async toggle_unstake(item,index) {
+      // this.unstake_visible[index] = !this.unstake_visible[index]
+      // if (this.unstake_visible[index] && this.unstake_text!=0) {
+      //   await this.unstake(this.unstake_text, index)
+      // }
+      // const count = Number(this.contract.from_yocto(item.amount).replace(/,/g, "")).toFixed(2) + Number(this.contract.from_yocto(item.profit).replace(/,/g, "")).toFixed(2);
+      // await this.unstake(count, index)
+      // this.$forceUpdate()
+    // },
 
     async harvest(index) {
       try {
         await this.contract.harvest(index)
-        window.alert("Harvest Success")
+        this.$toast.top('Harvest Success');
+        // window.alert("Harvest Success")
       } catch {
-        window.alert("Transaction Expired")
+        this.$toast.top('Transaction Expired');
+        // window.alert("Transaction Expired")
       }
       this.update()
     },
@@ -238,6 +267,49 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.mask{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:999;
+  background:rgba(0,0,0,0.7);
+  display:flex;
+  justify-content:center;
+  align-items: center;
+}
+
+
+.mask-content {
+  width: 300px;
+  border: none;
+  outline: 1px solid #fff;
+  padding: 30px;
+  margin: 0;
+  text-decoration: none;
+  text-transform: uppercase;
+  background: #FFF;
+  border-radius:10px;
+  font-size:14px;
+  color:#333;
+  font-weight:bold;
+}
+.mask-content .button-box{
+  display:flex;
+  margin-top:30px;
+  justify-content: right;
+  
+}
+
+.mask-content .button{
+  margin-left:20px;
+  cursor: pointer;
+}
+
+
+
+
 .index {
   display: flex;
   justify-content: center;
