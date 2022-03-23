@@ -37,17 +37,17 @@ impl Contract {
     pub fn unstake(&mut self, index: usize) {
         let sender_id = env::predecessor_account_id();
         let mut account = self.accounts.get(&sender_id).unwrap();
-        let mut stake = account.stakes.get_mut(index).unwrap();
-        let now = env::block_timestamp();
+        let stake = account.stakes.get_mut(index).unwrap();
         let amount = stake.amount + stake.profit - stake.loss;
         assert!(u64::from(stake.time) < u64::from(env::block_timestamp()), "in lock period");
         assert!(amount > 0, "not enough amount!");
         assert!(amount <= env::account_balance(), "not enough balance!");
 
         
-        self.round_status.stake_amount = self.round_status.stake_amount - amount;
-        stake.amount -= amount;
-        stake.time = now;
+        self.round_status.stake_amount -= stake.amount;
+        self.round_status.profit_amount -= stake.profit;
+        self.round_status.loss_amount -= stake.loss;
+        
         account.stakes.remove(index);
         
         if account.stakes.len() == 0 {

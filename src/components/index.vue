@@ -82,7 +82,7 @@
                   <text x="190" y="32" transform="rotate(350.3,190,190)">26</text>
                 </g>
                 <circle stroke-width="25" stroke="black" stroke-opacity="0.2" fill="transparent" cx="190" cy="190" r="116"></circle></g>
-                <g id="ball" class="ball" style="transform: rotate(0deg); transform-origin: 190px 190px; transitionDuration: 5s">
+                <g id="ball" class="ball" :class="waiting ? 'ball-ani':''" style="transform-origin: 190px 190px;">
                   <g transform="translate(178,48)">
                     <circle opacity=".4" fill="#231F20" cx="13" cy="15" r="13.5"></circle>
                     <circle fill="#FFF" cx="13" cy="13" r="12.5"></circle>
@@ -504,7 +504,7 @@
         spinning: false,
         already_bet: false,
         win_number: 0,
-        wheelSpinCounter: 0,
+        ballSpinCounter: 0,
         lastPosition: 0,
         interval: {},
         time_interval: {},
@@ -518,7 +518,8 @@
         history_numbers: [],
         history_bets: [],
         current_type:'number',
-        round_status:{}
+        round_status:{},
+        intervalHandler: 0
       }
     },
 
@@ -536,8 +537,7 @@
     },
 
     async destroyed() {
-      clearInterval(this.interval)
-      clearInterval(this.time_interval)
+      clearInterval(this.intervalHandler)
     },
 
     methods: {
@@ -609,7 +609,7 @@
 
 
       async handler(value) {
-        if (this.waiting || this.spinning) {
+        if (this.spinning) {
           return
         }
         // let roundStatus = await this.contract.get_round_status()
@@ -623,18 +623,17 @@
             // }
             
             this.round_status = await this.contract.get_round_status()
-            // let contractStatus = await this.contract.get_contract_status()
+            if (this.round_status.bet_count > 0 && this.waiting == false) {
+              this.waiting = true
+              this.waiting_spin_wheel()
+              this.intervalHandler = setInterval(() => {
+                this.waiting_spin_wheel()
+              }, 5010)
+            }
+            
             console.log(this.round_status.bet_count,'------contractStatus.bet_count-----');
             if (this.round_status.round_index!=this.round_index) {
-              this.waiting = true
-              this.round_status.bet_count = 0
-              this.win_number = this.round_status.last_round_win_number
-              this.spin_wheel()
-              this.round_index = this.round_status.round_index
-              this.$refs.actions.disabled = false
-              this.$refs.board.disabled = false
               this.waiting = false
-
             }
           }
         } catch (e) {
@@ -649,41 +648,6 @@
         this.animation(this.win_number, true)
         console.log(this.round_index,'-----this.round_index-----');
         wampApi.subscribe("chain-blocks-stats", this.handler)
-      },
-
-      async wait_for_spin() {
-        let round_status = await this.contract.get_round_status()
-        console.log(round_status,'---round_status-----');
-        this.win_number = round_status.last_round_win_number
-        this.round_index = round_status.round_index
-        this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_round_block_index) * 0.6)
-        this.remain_time = this.remain_time < 0 ? 0:this.remain_time
-        this.animation(this.win_number, true)
-        // this.history_numbers = round_status.history_numbers.reverse()
-
-        this.interval = setInterval(async () => {
-          if (this.waiting || this.spinning) {
-            return
-          }
-          this.waiting = true
-          let round_status = await this.contract.get_round_status()
-          if (round_status.round_index != this.round_index) {
-            this.win_number = round_status.last_round_win_number
-            this.round_index = round_status.round_index
-            this.remain_time = Math.floor((round_status.next_round_block_index - round_status.current_block_index) * 0.6)
-            this.remain_time = this.remain_time < 0 ? 0:this.remain_time
-            // this.history_numbers = round_status.history_numbers.reverse()
-            this.$refs.actions.disabled = false
-            this.$refs.board.disabled = false
-            this.spin_wheel()
-          }
-          this.waiting = false
-        }, 1000)
-
-        this.time_interval = setInterval(() => {
-          this.remain_time -= 1
-          this.remain_time = this.remain_time < 0 ? 0:this.remain_time
-        }, 1000);
       },
 
       deal_href() {
@@ -970,6 +934,27 @@
         }
       },
 
+      async waiting_spin_wheel() {
+        let ball = document.getElementById("ball");
+        this.ballSpinCounter += 3;
+        var totalDegrees = this.lastPosition + this.ballSpinCounter * 360
+        ball.style.transitionDuration = "5s"
+        ball.style.transform = "rotate(" + totalDegrees + "deg)";
+
+        if (this.waiting == false) {
+          setTimeout(() => {
+            this.round_status.bet_count = 0
+            this.win_number = this.round_status.last_round_win_number
+            this.spin_wheel()
+            this.round_index = this.round_status.round_index
+            this.$refs.actions.disabled = false
+            this.$refs.board.disabled = false
+            clearInterval(this.intervalHandler)
+          }, 5010)
+        }
+        
+  },
+
       async spin_wheel() {
         if (this.spinning) {
           return
@@ -978,14 +963,26 @@
         this.clear_spin()
         setTimeout(() => {
           this.show_won(this.win_number)
-        }, 5000);
+        }, 3000)
         setTimeout(() => {
           this.clear_ui()
           this.update()
           this.spinning = false
           this.already_bet = false
-        }, 8000)
-        this.animation(this.win_number)
+        }, 6000)
+        // setTimeout(() => {
+        //   this.clear_ui()
+        //   this.update()
+        //   this.spinning = false
+        //   this.already_bet = false
+        // }, 8000)
+        setTimeout(() => {
+
+        })
+        setTimeout(() => {
+          this.animation(this.win_number)
+        }, 10)
+        
         
       },
 
@@ -1040,9 +1037,10 @@
 
       animation(oneRandomNumber, init=false) {
         /* listening for events from the smart contract */
-        this.wheelSpinCounter += 1;
+        this.ballSpinCounter += 1;
         /* get wheel element */
-        var wheel = document.getElementById("ball");
+        var ball = document.getElementById("ball");
+        ball.style.animationName
         /* reset wheel */
         // wheel.style.transformOrigin = "190px 190px"
         // wheel.style.transitionDuration = "10s"
@@ -1057,17 +1055,17 @@
         /* calculate how much do we need to rotate to have the random number chosen */
         var numberDegree = numbers.indexOf(oneRandomNumber) * 360 / numbers.length;
         /* add some rounds before to look like it's spinning */
-        var numRoundsBefore = 3 * this.wheelSpinCounter;
+        var numRoundsBefore = this.ballSpinCounter;
         /* calculate total degrees we need to rotate */
         var totalDegrees = (numRoundsBefore * 360) + numberDegree;
         /* rotate the wheel */
         if (init) {
-          wheel.style.transitionDuration = "0s"
+          ball.style.transitionDuration = "0s"
         } else {
-          wheel.style.transitionDuration = "5s"
+          ball.style.transitionDuration = "3s"
         }
         
-        wheel.style.transform = "rotate(" + totalDegrees + "deg)";
+        ball.style.transform = "rotate(" + totalDegrees + "deg)";
         
         /* save position to be able to reset the wheel next time */
         this.lastPosition = numberDegree;
