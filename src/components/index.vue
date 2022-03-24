@@ -82,7 +82,7 @@
                   <text x="190" y="32" transform="rotate(350.3,190,190)">26</text>
                 </g>
                 <circle stroke-width="25" stroke="black" stroke-opacity="0.2" fill="transparent" cx="190" cy="190" r="116"></circle></g>
-                <g id="ball" class="ball" :class="waiting ? 'ball-ani':''" style="transform-origin: 190px 190px;">
+                <g id="ball" class="ball" style="transform-origin: 190px 190px;">
                   <g transform="translate(178,48)">
                     <circle opacity=".4" fill="#231F20" cx="13" cy="15" r="13.5"></circle>
                     <circle fill="#FFF" cx="13" cy="13" r="12.5"></circle>
@@ -519,7 +519,9 @@
         history_bets: [],
         current_type:'number',
         round_status:{},
-        intervalHandler: 0
+        intervalHandler: 0,
+        block_height: 0,
+        show_block_height: 0
       }
     },
 
@@ -595,29 +597,29 @@
           let chips = Number(bets[i].substring(index + 1))
           this.bet(number, bet_type, node, chips)
         }
-  
-        // this.bets = localStorage.getItem("bets") || []
-        // if (this.bets) {
-        //   console.log(this.bets)
-        //   for (let i = 0; i < this.bets.length; i++) {
-        //     let bet = this.bets[i]
-        //     bet.node = document.getElementById("n" + String(bet.bet_type) + String(bet.number))
-        //     this.updateBet(this.bets[i])
-        //   }
-        // }
       },
 
 
       async handler(value) {
+        if (this.block_height == 0 || this.show_block_height == 0) {
+          this.block_height = Number(value.latestBlockHeight)
+          this.show_block_height = Number(value.latestBlockHeight)
+        }
         if (this.spinning) {
           return
         }
         // let roundStatus = await this.contract.get_round_status()
-        console.log(this.round_status.next_round_block_index , value.latestBlockHeight,'-------value-------');
-        this.remain_time = Math.ceil((this.round_status.next_round_block_index - value.latestBlockHeight) * value.recentBlockProductionSpeed)+3
+        if (this.block_height == Number(value.latestBlockHeight)) {
+          this.show_block_height += 1
+        } else {
+          this.show_block_height = Number(value.latestBlockHeight)
+        }
+        this.block_height = value.latestBlockHeight
+
+        this.remain_time = Math.ceil((this.round_status.next_round_block_index - this.show_block_height) * value.recentBlockProductionSpeed)
         this.remain_time = this.remain_time < 0 ? 0:this.remain_time
         try {
-          if (this.round_status.next_round_block_index < Number(value.latestBlockHeight)) {
+          if (this.round_status.next_round_block_index < Number(this.show_block_height)) {
             // if(!this.is_pre_animation && this.round_status.round_index==this.round_index){
             //   this.animation(this.win_number, true,true)
             // }
@@ -628,10 +630,9 @@
               this.waiting_spin_wheel()
               this.intervalHandler = setInterval(() => {
                 this.waiting_spin_wheel()
-              }, 5010)
+              }, 3000)
             }
             
-            console.log(this.round_status.bet_count,'------contractStatus.bet_count-----');
             if (this.round_status.round_index!=this.round_index) {
               this.waiting = false
             }
@@ -646,8 +647,9 @@
         this.round_index = this.round_status.round_index
         this.win_number = this.round_status.last_round_win_number
         this.animation(this.win_number, true)
-        console.log(this.round_index,'-----this.round_index-----');
-        wampApi.subscribe("chain-blocks-stats", this.handler)
+        wampApi.subscribe("chain-blocks-stats", (value) => {
+          this.handler(value)
+        })
       },
 
       deal_href() {
@@ -938,21 +940,21 @@
 
       async waiting_spin_wheel() {
         let ball = document.getElementById("ball");
-        this.ballSpinCounter += 3;
+        this.ballSpinCounter += 2;
         var totalDegrees = this.lastPosition + this.ballSpinCounter * 360
-        ball.style.transitionDuration = "5s"
+        ball.style.transitionDuration = "3s"
+        ball.style.transitionTimingFunction = "linear"
         ball.style.transform = "rotate(" + totalDegrees + "deg)";
 
         if (this.waiting == false) {
+          clearInterval(this.intervalHandler)
           setTimeout(() => {
-            this.round_status.bet_count = 0
             this.win_number = this.round_status.last_round_win_number
             this.spin_wheel()
             this.round_index = this.round_status.round_index
             this.$refs.actions.disabled = false
             this.$refs.board.disabled = false
-            clearInterval(this.intervalHandler)
-          }, 5010)
+          }, 3000)
         }
         
   },
@@ -1010,7 +1012,6 @@
 
       toggle_deposit() {
         this.deposit_visible = !this.deposit_visible
-        console.log(this.deposit_visible,'-------');
         if (this.deposit_visible) {
           this.withdraw_visible = false
         } else {
@@ -1066,6 +1067,7 @@
         } else {
           ball.style.transitionDuration = "3s"
         }
+        ball.style.transitionTimingFunction = "ease-out"
         
         ball.style.transform = "rotate(" + totalDegrees + "deg)";
         
